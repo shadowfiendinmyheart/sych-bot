@@ -1,0 +1,36 @@
+{
+  "name": "dictionary-bot",
+  "version": "1.0.0",
+  "description": "for studying languages",
+  "main": "main.ts",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "cross-fetch": "^3.1.4",
+    "dotenv": "^10.0.0",
+    "nodemon": "^2.0.14",
+    "telegraf": "^4.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.6",
+    "@typescript-eslint/eslint-plugin": "^5.3.0",
+    "@typescript-eslint/parser": "^5.3.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.4.1",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.9.4"
+  },
+  "scripts": {
+    "start": "ts-node ./src/main.ts",
+    "dev": "nodemon ./src/main.ts",
+    "lint": "eslint --fix . && echo 'Lint complete.'",
+    "prettier": "prettier --write src/**/*.ts",
+    "tsc": "tsc",
+    "test": "echo 'Error: no test specified' && exit "
+  },
+  "author": "shadowfiendinmyheart@gmail.com",
+  "license": "ISC"
+}
