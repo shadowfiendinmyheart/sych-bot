@@ -1,8 +1,8 @@
 {
-  "name": "dictionary-bot",
+  "name": "sych-bot",
   "version": "1.0.0",
-  "description": "for studying languages",
-  "main": "main.ts",
+  "description": "for handling room photos",
+  "main": "index.ts",
   "dependencies": {
     "axios": "^0.24.0",
     "cross-fetch": "^3.1.4",
@@ -24,8 +24,8 @@
     "typescript": "^4.9.4"
   },
   "scripts": {
-    "start": "ts-node ./src/main.ts",
-    "dev": "nodemon ./src/main.ts",
+    "start": "ts-node ./src/index.ts",
+    "dev": "nodemon ./src/index.ts",
     "lint": "eslint --fix . && echo 'Lint complete.'",
     "prettier": "prettier --write src/**/*.ts",
     "tsc": "tsc",

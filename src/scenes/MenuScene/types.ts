@@ -1,3 +1,3 @@
 export enum KeyboardAction {
-  SendRoom = 'SendRoom',
+  Suggestion = 'SuggestionAction',
 }

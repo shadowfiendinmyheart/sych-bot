@@ -5,6 +5,9 @@ import { stopLoadingInlineButton } from './middlewares/inlineKeyboardMiddleware'
 import { debugLogger } from './middlewares/logger';
 
 import authScene from './scenes/MenuScene';
+import sendRoomScene from './scenes/SendRoomScene';
+import aboutRoomScene from './scenes/AboutRoomScene';
+
 import { SceneAlias } from './types/scenes';
 
 if (!process.env.BOT_TOKEN) {
@@ -12,20 +15,25 @@ if (!process.env.BOT_TOKEN) {
 }
 
 const bot = new Telegraf<Scenes.SceneContext>(process.env.BOT_TOKEN as string);
-const stage = new Scenes.Stage<Scenes.SceneContext>([authScene]);
+const stage = new Scenes.Stage<Scenes.SceneContext>([
+  authScene,
+  sendRoomScene,
+  aboutRoomScene,
+]);
 
 bot.use(debugLogger);
-bot.use(stopLoadingInlineButton);
+// bot.use(stopLoadingInlineButton);
 bot.use(session());
 bot.use(stage.middleware());
 
 bot.start(async (ctx) => {
   await ctx.reply('Вас приветствует Сычебот v.1');
-  ctx.scene.enter(SceneAlias.Menu);
+  // ctx.scene.enter(SceneAlias.Menu);
+  ctx.scene.enter(SceneAlias.SendRoom);
 });
 
 bot.on('message', async (ctx) => {
-  ctx.scene.enter('auth');
+  ctx.scene.enter(SceneAlias.Menu);
 });
 
 bot.launch();
