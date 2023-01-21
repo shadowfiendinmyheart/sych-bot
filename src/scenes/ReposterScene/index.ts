@@ -1,0 +1,50 @@
+import { Scenes } from 'telegraf';
+
+import { getReposterKeyboard, getVkLastPost } from './utils';
+
+import { SceneAlias } from '../../types/scenes';
+
+export enum KeyboardAction {
+  On = 'On',
+  Off = 'Off',
+  Back = 'Back',
+}
+
+let interval: NodeJS.Timer;
+
+const reposterScene = new Scenes.BaseScene<Scenes.SceneContext>(
+  SceneAlias.Reposter
+);
+
+reposterScene.enter(async (ctx) => {
+  const userId = ctx.from?.id;
+  console.log('interval', interval);
+  await ctx.reply('Выберите нужный пункт меню', getReposterKeyboard());
+});
+
+reposterScene.action(KeyboardAction.On, async (ctx) => {
+  if (interval) {
+    console.log('interval already working...');
+    return;
+  }
+  interval = setInterval(async () => {
+    // await getVkLastPost();
+    await ctx.reply('test ctx');
+  }, 10000);
+});
+
+reposterScene.action(KeyboardAction.Off, async (ctx) => {
+  console.log('off', interval);
+  // TODO: check is interval empty
+  if (!interval) {
+    console.log('interval is empty...');
+    return;
+  }
+  clearInterval(interval);
+});
+
+reposterScene.action(KeyboardAction.Back, async (ctx) => {
+  await ctx.scene.enter(SceneAlias.Menu);
+});
+
+export default reposterScene;

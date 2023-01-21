@@ -1,8 +1,16 @@
 import { Markup } from 'telegraf';
+import { KeyboardAction } from '.';
 
-import { KeyboardAction } from './types';
-
-export const menuKeyboard = Markup.inlineKeyboard([
-  [Markup.button.callback('Предложка', KeyboardAction.Suggestion)],
-  [Markup.button.callback('Сычевальня TOP', KeyboardAction.Suggestion)],
-]);
+export const getMenuKeyboard = (isAdmin: boolean) => {
+  const buttons = [
+    [Markup.button.callback('Предложка', KeyboardAction.Suggestion)],
+    [Markup.button.callback('Сычевальня TOP', KeyboardAction.Suggestion)],
+  ];
+  if (isAdmin) {
+    buttons.push([
+      Markup.button.callback('Админка', KeyboardAction.Admin),
+      Markup.button.callback('Репостер', KeyboardAction.Reposter),
+    ]);
+  }
+  return Markup.inlineKeyboard(buttons);
+};

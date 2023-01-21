@@ -15,9 +15,12 @@
   },
   "plugins": ["@typescript-eslint", "prettier"],
   "rules": {
-    "prettier/prettier": ["error", {
-      "endOfLine": "auto",
-      "singleQuote": true
-    }]
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto",
+        "singleQuote": true
+      }
+    ]
   }
 }

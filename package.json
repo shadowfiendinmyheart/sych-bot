@@ -27,7 +27,7 @@
     "start": "ts-node ./src/index.ts",
     "dev": "nodemon ./src/index.ts",
     "lint": "eslint --fix . && echo 'Lint complete.'",
-    "prettier": "prettier --write src/**/*.ts",
+    "prettier": "prettier --write .",
     "tsc": "tsc",
     "test": "echo 'Error: no test specified' && exit "
   },

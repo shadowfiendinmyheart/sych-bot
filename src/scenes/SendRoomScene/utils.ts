@@ -1,14 +1,22 @@
 import * as fs from 'fs';
 import axios from 'axios';
 import { Markup } from 'telegraf';
+import { KeyboardAction } from './';
 
-import { KeyboardAction } from './types';
-import { Suggestion, SuggestionsFile } from '../../types/interfaces';
+import {
+  Suggestion,
+  SuggestionsFile,
+  SuggestionStatus,
+} from '../../types/interfaces';
 import { suggestionFolderPath } from '../../const';
+import { MediaGroup } from 'telegraf/typings/telegram-types';
 
-export const sendRoomKeyboard = Markup.inlineKeyboard([
-  [Markup.button.callback('Назад', KeyboardAction.Back)],
-]);
+export const getSendRoomKeyboard = () =>
+  Markup.inlineKeyboard([
+    [Markup.button.callback('Назад', KeyboardAction.Back)],
+    [Markup.button.callback('Отправить', KeyboardAction.Send)],
+    [Markup.button.callback('Удалить', KeyboardAction.Delete)],
+  ]);
 
 export const savePostInFolder = async (
   href: string,
@@ -37,4 +45,39 @@ export const saveSuggestionInfo = async (suggestion: Suggestion) => {
   const suggestionsList: SuggestionsFile = JSON.parse(suggestionsListRaw);
   suggestionsList[suggestion.user_id] = suggestion;
   fs.writeFileSync(suggestionFilePath, JSON.stringify(suggestionsList));
+};
+
+export const getSuggestionInfo = async (userId: string | number) => {
+  const suggestionFilePath = `${suggestionFolderPath}/suggestions.json`;
+  const suggestionsListRaw = fs.readFileSync(suggestionFilePath, 'utf-8');
+  const suggestionsList: SuggestionsFile = JSON.parse(suggestionsListRaw);
+  return suggestionsList[Number(userId)];
+};
+
+export const changeSuggestionStatus = async (
+  userId: string | number,
+  status: SuggestionStatus
+) => {
+  const suggestion = await getSuggestionInfo(userId);
+  await saveSuggestionInfo({ ...suggestion, status: status });
+};
+
+export const getSuggestionMediaGroupPost = async (userId: string | number) => {
+  const existedSuggestionInfo = await getSuggestionInfo(userId);
+  if (!existedSuggestionInfo || existedSuggestionInfo.fileIds.length === 0) {
+    return false;
+  }
+
+  const mediaGroupPost: MediaGroup = existedSuggestionInfo.fileIds.map(
+    (fileId, index) => {
+      return index === 0
+        ? {
+            media: fileId,
+            type: 'photo',
+            caption: existedSuggestionInfo.caption,
+          }
+        : { media: fileId, type: 'photo' };
+    }
+  );
+  return mediaGroupPost;
 };

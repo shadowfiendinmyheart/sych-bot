@@ -1,28 +1,52 @@
 import { Scenes } from 'telegraf';
 
-import { menuKeyboard } from './utils';
+import { getMenuKeyboard } from './utils';
 
 import { SceneAlias } from '../../types/scenes';
-import { KeyboardAction } from './types';
+import { checkIsAdmin } from '../../utils/user';
+
+export enum KeyboardAction {
+  Suggestion = 'Suggestion',
+  Leaderboard = 'Leaderboard',
+  Admin = 'AdminAction',
+  Reposter = 'Reposer',
+}
 
 const menuScene = new Scenes.BaseScene<Scenes.SceneContext>(SceneAlias.Menu);
 
-menuScene.enter(async(ctx) => {
-  await ctx.reply('Выберите нужный пункт меню', menuKeyboard);
-});
-
-menuScene.action(KeyboardAction.Suggestion, async (ctx) => {
-  const isSuggestionExist = false;
-  if (isSuggestionExist) {
-    await ctx.scene.enter(SceneAlias.AboutRoom);
-
-    await ctx.reply('Выберите нужный пункт меню', menuKeyboard);
+menuScene.enter(async (ctx) => {
+  const userId = ctx.from?.id;
+  if (!userId) {
+    await ctx.reply('Выберите нужный пункт меню', getMenuKeyboard(false));
     return;
   }
 
+  const isAdmin = checkIsAdmin(userId);
+  await ctx.reply('Выберите нужный пункт меню', getMenuKeyboard(isAdmin));
+});
+
+menuScene.action(KeyboardAction.Suggestion, async (ctx) => {
+  const userId = ctx.from?.id;
+
   await ctx.scene.enter(SceneAlias.SendRoom);
 
-  await ctx.reply('Выберите нужный пункт меню', menuKeyboard);
+  await ctx.reply(
+    'Выберите нужный пункт меню',
+    getMenuKeyboard(Boolean(userId))
+  );
+});
+
+menuScene.action(KeyboardAction.Leaderboard, async (ctx) => {
+  // enter to leaderboard scene
+});
+
+menuScene.action(KeyboardAction.Admin, async (ctx) => {
+  // enter to admin scene
+});
+
+menuScene.action(KeyboardAction.Reposter, async (ctx) => {
+  // enter to reposter scene
+  await ctx.scene.enter(SceneAlias.Reposter);
 });
 
 export default menuScene;

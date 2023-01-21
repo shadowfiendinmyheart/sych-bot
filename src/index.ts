@@ -7,6 +7,7 @@ import { debugLogger } from './middlewares/logger';
 import authScene from './scenes/MenuScene';
 import sendRoomScene from './scenes/SendRoomScene';
 import aboutRoomScene from './scenes/AboutRoomScene';
+import reposterScene from './scenes/ReposterScene';
 
 import { SceneAlias } from './types/scenes';
 
@@ -19,6 +20,7 @@ const stage = new Scenes.Stage<Scenes.SceneContext>([
   authScene,
   sendRoomScene,
   aboutRoomScene,
+  reposterScene,
 ]);
 
 bot.use(debugLogger);
@@ -28,8 +30,9 @@ bot.use(stage.middleware());
 
 bot.start(async (ctx) => {
   await ctx.reply('Вас приветствует Сычебот v.1');
-  // ctx.scene.enter(SceneAlias.Menu);
-  ctx.scene.enter(SceneAlias.SendRoom);
+  const userId = ctx.message.from.id;
+  ctx.scene.enter(SceneAlias.Menu);
+  // ctx.scene.enter(SceneAlias.SendRoom);
 });
 
 bot.on('message', async (ctx) => {
