@@ -1,13 +1,14 @@
-import { Scenes } from 'telegraf';
+import { Scenes } from "telegraf";
 
-import { getReposterKeyboard, getVkLastPost } from './utils';
+import { checkPeriod, getReposterKeyboard, makeRepost } from "./utils";
 
-import { SceneAlias } from '../../types/scenes';
+import { SceneAlias } from "../../types/scenes";
 
 export enum KeyboardAction {
-  On = 'On',
-  Off = 'Off',
-  Back = 'Back',
+  On = "On",
+  Off = "Off",
+  Back = "Back",
+  Test = "Test",
 }
 
 let interval: NodeJS.Timer;
@@ -18,26 +19,25 @@ const reposterScene = new Scenes.BaseScene<Scenes.SceneContext>(
 
 reposterScene.enter(async (ctx) => {
   const userId = ctx.from?.id;
-  console.log('interval', interval);
-  await ctx.reply('Выберите нужный пункт меню', getReposterKeyboard());
+  await ctx.reply("Выберите нужный пункт меню", getReposterKeyboard());
 });
 
 reposterScene.action(KeyboardAction.On, async (ctx) => {
   if (interval) {
-    console.log('interval already working...');
+    console.log("interval already working...");
     return;
   }
+
   interval = setInterval(async () => {
-    // await getVkLastPost();
-    await ctx.reply('test ctx');
-  }, 10000);
+    await makeRepost();
+  }, checkPeriod);
 });
 
 reposterScene.action(KeyboardAction.Off, async (ctx) => {
-  console.log('off', interval);
+  console.log("off", interval);
   // TODO: check is interval empty
   if (!interval) {
-    console.log('interval is empty...');
+    console.log("interval is empty...");
     return;
   }
   clearInterval(interval);
@@ -45,6 +45,10 @@ reposterScene.action(KeyboardAction.Off, async (ctx) => {
 
 reposterScene.action(KeyboardAction.Back, async (ctx) => {
   await ctx.scene.enter(SceneAlias.Menu);
+});
+
+reposterScene.action(KeyboardAction.Test, async (ctx) => {
+  await makeRepost();
 });
 
 export default reposterScene;
