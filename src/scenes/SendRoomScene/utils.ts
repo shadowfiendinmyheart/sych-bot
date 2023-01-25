@@ -31,7 +31,7 @@ export const savePostInFolder = async (
         console.log('file saved!');
         resolve(true);
       })
-      .on('error', (e: any) => {
+      .on('error', (e: Error) => {
         console.log(e);
         fs.rmSync(folderPath, { recursive: true, force: true });
         reject(e);

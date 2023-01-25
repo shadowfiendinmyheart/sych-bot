@@ -24,15 +24,13 @@ const stage = new Scenes.Stage<Scenes.SceneContext>([
 ]);
 
 bot.use(debugLogger);
-// bot.use(stopLoadingInlineButton);
+bot.use(stopLoadingInlineButton);
 bot.use(session());
 bot.use(stage.middleware());
 
 bot.start(async (ctx) => {
   await ctx.reply('Вас приветствует Сычебот v.1');
-  const userId = ctx.message.from.id;
   ctx.scene.enter(SceneAlias.Menu);
-  // ctx.scene.enter(SceneAlias.SendRoom);
 });
 
 bot.on('message', async (ctx) => {

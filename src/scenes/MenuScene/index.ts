@@ -44,8 +44,8 @@ menuScene.action(KeyboardAction.Admin, async (ctx) => {
   // enter to admin scene
 });
 
+// enter to reposter scene
 menuScene.action(KeyboardAction.Reposter, async (ctx) => {
-  // enter to reposter scene
   await ctx.scene.enter(SceneAlias.Reposter);
 });
 
