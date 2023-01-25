@@ -2,9 +2,10 @@ import { Markup } from 'telegraf';
 import { KeyboardAction } from '.';
 
 export const getMenuKeyboard = (isAdmin: boolean) => {
+  // TODO: unblock after finish work on these features
   const buttons = [
-    [Markup.button.callback('Предложка', KeyboardAction.Suggestion)],
-    [Markup.button.callback('Сычевальня TOP', KeyboardAction.Suggestion)],
+    // [Markup.button.callback('Предложка', KeyboardAction.Suggestion)],
+    // [Markup.button.callback('Сычевальня TOP', KeyboardAction.Suggestion)],
   ];
   if (isAdmin) {
     buttons.push([
