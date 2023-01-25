@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 interface TgPost {
   text?: string;
@@ -11,7 +11,7 @@ export const tgRequest = async (method: string, body: object) => {
     body
   );
   if (!tgResponse.data.ok) {
-    console.log('tgRequest is not ok', tgResponse.data);
+    console.log("tgRequest is not ok", tgResponse.data);
     return;
   }
   return tgResponse.data;
@@ -21,7 +21,7 @@ export const makePostToTg = async (post: TgPost) => {
   if (post.photos?.length === 0) return;
   const photos = post.photos.map((photo, index) => {
     const media = {
-      type: 'photo',
+      type: "photo",
       media: photo,
     };
     return index ? media : { caption: post.text, ...media };

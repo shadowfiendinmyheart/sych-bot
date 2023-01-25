@@ -3,11 +3,11 @@ export interface IUserData {
 }
 
 export type SuggestionStatus =
-  | 'new'
-  | 'active'
-  | 'canceled'
-  | 'accepted'
-  | 'posted';
+  | "new"
+  | "active"
+  | "canceled"
+  | "accepted"
+  | "posted";
 
 export interface Suggestion {
   status: SuggestionStatus;

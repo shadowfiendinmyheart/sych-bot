@@ -1,17 +1,17 @@
-import axios from 'axios';
-import { checkPeriod } from './utils';
+import axios from "axios";
+import { checkPeriod } from "./utils";
 
 interface VkPost {
   id: number;
   date: number;
   text: string;
   marked_as_ads: 0 | 1;
-  post_type: 'post' | 'repost';
+  post_type: "post" | "repost";
   attachments: VkAttachment[];
 }
 
 interface VkAttachment {
-  type: 'photo' | 'link';
+  type: "photo" | "link";
   photo: VkPhoto;
 }
 
@@ -20,7 +20,7 @@ interface VkPhoto {
   id: number;
   owner_id: number;
   sizes: Array<{
-    type: 's' | 'm' | 'x' | 'y' | 'w' | 'o' | 'p' | 'q' | 'r';
+    type: "s" | "m" | "x" | "y" | "w" | "o" | "p" | "q" | "r";
     height: number;
     width: number;
     url: string;
@@ -33,7 +33,7 @@ export const checkIsPosted = (postTimestamp: number) => {
 };
 
 export const checkIsValid = (post: VkPost) => {
-  if (post.marked_as_ads || post.post_type !== 'post') return false;
+  if (post.marked_as_ads || post.post_type !== "post") return false;
   return true;
 };
 

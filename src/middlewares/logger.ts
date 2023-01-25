@@ -1,6 +1,6 @@
-import { Context } from 'telegraf';
+import { Context } from "telegraf";
 
-import { callbackFunction } from '../types/functions';
+import { callbackFunction } from "../types/functions";
 
 export const debugLogger = async (ctx: Context, next: callbackFunction) => {
   if (ctx.message) {

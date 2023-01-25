@@ -1,21 +1,21 @@
-import * as fs from 'fs';
-import axios from 'axios';
-import { Markup } from 'telegraf';
-import { KeyboardAction } from './';
+import * as fs from "fs";
+import axios from "axios";
+import { Markup } from "telegraf";
+import { KeyboardAction } from "./";
 
 import {
   Suggestion,
   SuggestionsFile,
   SuggestionStatus,
-} from '../../types/interfaces';
-import { suggestionFolderPath } from '../../const';
-import { MediaGroup } from 'telegraf/typings/telegram-types';
+} from "../../types/interfaces";
+import { suggestionFolderPath } from "../../const";
+import { MediaGroup } from "telegraf/typings/telegram-types";
 
 export const getSendRoomKeyboard = () =>
   Markup.inlineKeyboard([
-    [Markup.button.callback('Назад', KeyboardAction.Back)],
-    [Markup.button.callback('Отправить', KeyboardAction.Send)],
-    [Markup.button.callback('Удалить', KeyboardAction.Delete)],
+    [Markup.button.callback("Назад", KeyboardAction.Back)],
+    [Markup.button.callback("Отправить", KeyboardAction.Send)],
+    [Markup.button.callback("Удалить", KeyboardAction.Delete)],
   ]);
 
 export const savePostInFolder = async (
@@ -23,15 +23,15 @@ export const savePostInFolder = async (
   folderPath: string,
   fileName: string
 ) => {
-  const response = await axios({ url: href, responseType: 'stream' });
+  const response = await axios({ url: href, responseType: "stream" });
   return new Promise((resolve, reject) => {
     response.data
       .pipe(fs.createWriteStream(`${folderPath}/${fileName}.jpg`))
-      .on('finish', () => {
-        console.log('file saved!');
+      .on("finish", () => {
+        console.log("file saved!");
         resolve(true);
       })
-      .on('error', (e: Error) => {
+      .on("error", (e: Error) => {
         console.log(e);
         fs.rmSync(folderPath, { recursive: true, force: true });
         reject(e);
@@ -41,7 +41,7 @@ export const savePostInFolder = async (
 
 export const saveSuggestionInfo = async (suggestion: Suggestion) => {
   const suggestionFilePath = `${suggestionFolderPath}/suggestions.json`;
-  const suggestionsListRaw = fs.readFileSync(suggestionFilePath, 'utf-8');
+  const suggestionsListRaw = fs.readFileSync(suggestionFilePath, "utf-8");
   const suggestionsList: SuggestionsFile = JSON.parse(suggestionsListRaw);
   suggestionsList[suggestion.user_id] = suggestion;
   fs.writeFileSync(suggestionFilePath, JSON.stringify(suggestionsList));
@@ -49,7 +49,7 @@ export const saveSuggestionInfo = async (suggestion: Suggestion) => {
 
 export const getSuggestionInfo = async (userId: string | number) => {
   const suggestionFilePath = `${suggestionFolderPath}/suggestions.json`;
-  const suggestionsListRaw = fs.readFileSync(suggestionFilePath, 'utf-8');
+  const suggestionsListRaw = fs.readFileSync(suggestionFilePath, "utf-8");
   const suggestionsList: SuggestionsFile = JSON.parse(suggestionsListRaw);
   return suggestionsList[Number(userId)];
 };
@@ -73,10 +73,10 @@ export const getSuggestionMediaGroupPost = async (userId: string | number) => {
       return index === 0
         ? {
             media: fileId,
-            type: 'photo',
+            type: "photo",
             caption: existedSuggestionInfo.caption,
           }
-        : { media: fileId, type: 'photo' };
+        : { media: fileId, type: "photo" };
     }
   );
   return mediaGroupPost;

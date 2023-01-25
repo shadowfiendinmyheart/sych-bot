@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import { Scenes } from 'telegraf';
+import * as fs from "fs";
+import { Scenes } from "telegraf";
 
 import {
   changeSuggestionStatus,
@@ -8,15 +8,15 @@ import {
   savePostInFolder,
   saveSuggestionInfo,
   getSendRoomKeyboard,
-} from './utils';
+} from "./utils";
 
-import { SceneAlias } from '../../types/scenes';
-import { suggestionFolderPath } from '../../const';
+import { SceneAlias } from "../../types/scenes";
+import { suggestionFolderPath } from "../../const";
 
 export enum KeyboardAction {
-  Back = 'Menu',
-  Send = 'Send',
-  Delete = 'Delete',
+  Back = "Menu",
+  Send = "Send",
+  Delete = "Delete",
 }
 
 const sendRoomScene = new Scenes.BaseScene<Scenes.SceneContext>(
@@ -24,12 +24,12 @@ const sendRoomScene = new Scenes.BaseScene<Scenes.SceneContext>(
 );
 
 const welcomeSceneText =
-  'Отправьте сообщение с фотографиями вашей сычевальни, по желанию можете добавить к вашей записи текст :)';
+  "Отправьте сообщение с фотографиями вашей сычевальни, по желанию можете добавить к вашей записи текст :)";
 sendRoomScene.enter(async (ctx) => {
   const userId = ctx.from?.id;
   if (!userId) {
     await ctx.reply(
-      'Произошла ошибка, попробуйте позже, или обратитесь к администратору'
+      "Произошла ошибка, попробуйте позже, или обратитесь к администратору"
     );
     ctx.scene.enter(SceneAlias.Menu);
     return;
@@ -48,7 +48,7 @@ sendRoomScene.enter(async (ctx) => {
     return;
   }
 
-  await ctx.reply('Ваша предложка:');
+  await ctx.reply("Ваша предложка:");
   await ctx.replyWithMediaGroup(mediaGroupPost);
 });
 
@@ -62,18 +62,18 @@ sendRoomScene.action(KeyboardAction.Send, async (ctx) => {
   const userId = ctx.from?.id;
   if (!userId) {
     await ctx.reply(
-      'Произошла ошибка, попробуйте позже, или обратитесь к администратору'
+      "Произошла ошибка, попробуйте позже, или обратитесь к администратору"
     );
     ctx.scene.enter(SceneAlias.Menu);
     return;
   }
-  await changeSuggestionStatus(userId, 'active');
-  await ctx.reply('Предложка успешно отправлена');
+  await changeSuggestionStatus(userId, "active");
+  await ctx.reply("Предложка успешно отправлена");
   ctx.scene.enter(SceneAlias.Menu);
 });
 
 // Вызывается на каждую фотку
-sendRoomScene.on('photo', async (ctx) => {
+sendRoomScene.on("photo", async (ctx) => {
   const photos = ctx.message.photo;
   const caption = ctx.message.caption;
   const userId = ctx.message.from.id;
@@ -92,17 +92,17 @@ sendRoomScene.on('photo', async (ctx) => {
     const existedSuggestionInfo = await getSuggestionInfo(userId);
     await saveSuggestionInfo({
       fileIds: [...existedSuggestionInfo.fileIds, fileId],
-      status: 'new',
-      caption: caption || '',
+      status: "new",
+      caption: caption || "",
       user_id: userId,
       username: username,
     });
   } catch (error) {
-    await ctx.reply('Произошла ошибка на сервере... Попробуйте позже');
-    console.log('---');
-    console.log('save suggestion error', error);
-    console.log('message', ctx.message);
-    console.log('---');
+    await ctx.reply("Произошла ошибка на сервере... Попробуйте позже");
+    console.log("---");
+    console.log("save suggestion error", error);
+    console.log("message", ctx.message);
+    console.log("---");
     await ctx.scene.enter(SceneAlias.Menu);
   }
 });

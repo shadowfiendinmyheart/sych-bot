@@ -1,18 +1,18 @@
-import 'dotenv/config';
-import { Telegraf, session, Scenes } from 'telegraf';
-import { stopLoadingInlineButton } from './middlewares/inlineKeyboardMiddleware';
+import "dotenv/config";
+import { Telegraf, session, Scenes } from "telegraf";
+import { stopLoadingInlineButton } from "./middlewares/inlineKeyboardMiddleware";
 
-import { debugLogger } from './middlewares/logger';
+import { debugLogger } from "./middlewares/logger";
 
-import authScene from './scenes/MenuScene';
-import sendRoomScene from './scenes/SendRoomScene';
-import aboutRoomScene from './scenes/AboutRoomScene';
-import reposterScene from './scenes/ReposterScene';
+import authScene from "./scenes/MenuScene";
+import sendRoomScene from "./scenes/SendRoomScene";
+import aboutRoomScene from "./scenes/AboutRoomScene";
+import reposterScene from "./scenes/ReposterScene";
 
-import { SceneAlias } from './types/scenes';
+import { SceneAlias } from "./types/scenes";
 
 if (!process.env.BOT_TOKEN) {
-  throw new Error('BOT_TOKEN must be provided!');
+  throw new Error("BOT_TOKEN must be provided!");
 }
 
 const bot = new Telegraf<Scenes.SceneContext>(process.env.BOT_TOKEN as string);
@@ -29,18 +29,18 @@ bot.use(session());
 bot.use(stage.middleware());
 
 bot.start(async (ctx) => {
-  await ctx.reply('Вас приветствует Сычебот v.1');
+  await ctx.reply("Вас приветствует Сычебот v.1");
   ctx.scene.enter(SceneAlias.Menu);
 });
 
-bot.on('message', async (ctx) => {
+bot.on("message", async (ctx) => {
   ctx.scene.enter(SceneAlias.Menu);
 });
 
 bot.launch();
 
-console.log('working . . .');
+console.log("working . . .");
 
 // Enable graceful stop
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
+process.once("SIGINT", () => bot.stop("SIGINT"));
+process.once("SIGTERM", () => bot.stop("SIGTERM"));

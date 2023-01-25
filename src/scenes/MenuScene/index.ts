@@ -1,15 +1,15 @@
-import { Scenes } from 'telegraf';
+import { Scenes } from "telegraf";
 
-import { getMenuKeyboard } from './utils';
+import { getMenuKeyboard } from "./utils";
 
-import { SceneAlias } from '../../types/scenes';
-import { checkIsAdmin } from '../../utils/user';
+import { SceneAlias } from "../../types/scenes";
+import { checkIsAdmin } from "../../utils/user";
 
 export enum KeyboardAction {
-  Suggestion = 'Suggestion',
-  Leaderboard = 'Leaderboard',
-  Admin = 'AdminAction',
-  Reposter = 'Reposer',
+  Suggestion = "Suggestion",
+  Leaderboard = "Leaderboard",
+  Admin = "AdminAction",
+  Reposter = "Reposer",
 }
 
 const menuScene = new Scenes.BaseScene<Scenes.SceneContext>(SceneAlias.Menu);
@@ -17,12 +17,12 @@ const menuScene = new Scenes.BaseScene<Scenes.SceneContext>(SceneAlias.Menu);
 menuScene.enter(async (ctx) => {
   const userId = ctx.from?.id;
   if (!userId) {
-    await ctx.reply('Выберите нужный пункт меню', getMenuKeyboard(false));
+    await ctx.reply("Выберите нужный пункт меню", getMenuKeyboard(false));
     return;
   }
 
   const isAdmin = checkIsAdmin(userId);
-  await ctx.reply('Выберите нужный пункт меню', getMenuKeyboard(isAdmin));
+  await ctx.reply("Выберите нужный пункт меню", getMenuKeyboard(isAdmin));
 });
 
 menuScene.action(KeyboardAction.Suggestion, async (ctx) => {
@@ -31,7 +31,7 @@ menuScene.action(KeyboardAction.Suggestion, async (ctx) => {
   await ctx.scene.enter(SceneAlias.SendRoom);
 
   await ctx.reply(
-    'Выберите нужный пункт меню',
+    "Выберите нужный пункт меню",
     getMenuKeyboard(Boolean(userId))
   );
 });

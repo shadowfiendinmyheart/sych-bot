@@ -1,14 +1,14 @@
-import { Markup } from 'telegraf';
-import { KeyboardAction } from '.';
-import { checkIsPosted, checkIsValid, getVkLastPost } from './vkApi';
-import { makePostToTg } from './tgApi';
+import { Markup } from "telegraf";
+import { KeyboardAction } from ".";
+import { checkIsPosted, checkIsValid, getVkLastPost } from "./vkApi";
+import { makePostToTg } from "./tgApi";
 
 export const getReposterKeyboard = () => {
   return Markup.inlineKeyboard([
-    [Markup.button.callback('Включить репостер', KeyboardAction.On)],
-    [Markup.button.callback('Выключить репостер', KeyboardAction.Off)],
-    [Markup.button.callback('Назад', KeyboardAction.Back)],
-    [Markup.button.callback('Тест', KeyboardAction.Test)],
+    [Markup.button.callback("Включить репостер", KeyboardAction.On)],
+    [Markup.button.callback("Выключить репостер", KeyboardAction.Off)],
+    [Markup.button.callback("Назад", KeyboardAction.Back)],
+    [Markup.button.callback("Тест", KeyboardAction.Test)],
   ]);
 };
 
@@ -35,7 +35,7 @@ export const makeRepost = async () => {
   }
 
   const photosUrl = vkPost.attachments.reduce((prev, attachment) => {
-    if (attachment.type !== 'photo') return prev;
+    if (attachment.type !== "photo") return prev;
     let maxHeight = 0;
     let maxHeightIndex = 0;
     attachment.photo.sizes.forEach((size, index) => {
@@ -54,6 +54,6 @@ export const makeRepost = async () => {
   });
   if (!tgResponse) return;
   if (!tgResponse.data.ok) {
-    console.log('Error post to tg:', tgResponse.data);
+    console.log("Error post to tg:", tgResponse.data);
   }
 };

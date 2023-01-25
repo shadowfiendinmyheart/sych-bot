@@ -1,6 +1,6 @@
-import { Context, Telegram } from 'telegraf';
-import { ExtraEditMessageText } from 'telegraf/typings/telegram-types';
-import { Message } from 'typegram';
+import { Context, Telegram } from "telegraf";
+import { ExtraEditMessageText } from "telegraf/typings/telegram-types";
+import { Message } from "typegram";
 
 const telegram: Telegram = new Telegram(process.env.BOT_TOKEN as string);
 
@@ -33,7 +33,7 @@ export const editChatMessage = async (
     await telegram.editMessageText(
       message.chat.id,
       message.message_id,
-      '',
+      "",
       text,
       keyboard
     );

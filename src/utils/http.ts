@@ -1,8 +1,8 @@
-import fetch from 'cross-fetch';
+import fetch from "cross-fetch";
 
 const http = async (
   url: string,
-  method = 'GET',
+  method = "GET",
   body?: object | string | null,
   headers?: object | null
 ) => {
@@ -15,10 +15,10 @@ const http = async (
       method: method,
       body: body,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...headers,
       },
-      credentials: 'same-origin',
+      credentials: "same-origin",
     });
 
     const data = await res.json();

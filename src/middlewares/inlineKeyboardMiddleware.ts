@@ -1,5 +1,5 @@
-import { Context } from 'telegraf';
-import { callbackFunction } from '../types/functions';
+import { Context } from "telegraf";
+import { callbackFunction } from "../types/functions";
 
 export const stopLoadingInlineButton = async (
   ctx: Context,

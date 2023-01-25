@@ -1,11 +1,11 @@
-import { Scenes } from 'telegraf';
+import { Scenes } from "telegraf";
 
-import { getRoomKeyboard } from './utils';
+import { getRoomKeyboard } from "./utils";
 
-import { SceneAlias } from '../../types/scenes';
+import { SceneAlias } from "../../types/scenes";
 
 export enum KeyboardAction {
-  Back = 'Back',
+  Back = "Back",
 }
 
 const aboutRoomScene = new Scenes.BaseScene<Scenes.SceneContext>(
@@ -14,7 +14,7 @@ const aboutRoomScene = new Scenes.BaseScene<Scenes.SceneContext>(
 
 aboutRoomScene.enter((ctx) => {
   // show suggestion
-  ctx.reply('Ваша предложка...', getRoomKeyboard());
+  ctx.reply("Ваша предложка...", getRoomKeyboard());
 });
 
 aboutRoomScene.action(KeyboardAction.Back, async (ctx) => {

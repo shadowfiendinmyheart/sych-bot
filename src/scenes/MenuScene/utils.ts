@@ -1,5 +1,5 @@
-import { Markup } from 'telegraf';
-import { KeyboardAction } from '.';
+import { Markup } from "telegraf";
+import { KeyboardAction } from ".";
 
 export const getMenuKeyboard = (isAdmin: boolean) => {
   // TODO: unblock after finish work on these features
@@ -9,8 +9,8 @@ export const getMenuKeyboard = (isAdmin: boolean) => {
   ];
   if (isAdmin) {
     buttons.push([
-      Markup.button.callback('Админка', KeyboardAction.Admin),
-      Markup.button.callback('Репостер', KeyboardAction.Reposter),
+      Markup.button.callback("Админка", KeyboardAction.Admin),
+      Markup.button.callback("Репостер", KeyboardAction.Reposter),
     ]);
   }
   return Markup.inlineKeyboard(buttons);
