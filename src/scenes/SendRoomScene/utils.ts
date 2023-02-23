@@ -8,7 +8,7 @@ import {
   SuggestionsFile,
   SuggestionStatus,
 } from "../../types/interfaces";
-import { suggestionFolderPath } from "../../const";
+import { ENCODING_FORMAT, suggestionFolderPath } from "../../const";
 import { MediaGroup } from "telegraf/typings/telegram-types";
 
 export const getSendRoomKeyboard = () =>
@@ -41,7 +41,10 @@ export const savePostInFolder = async (
 
 export const saveSuggestionInfo = async (suggestion: Suggestion) => {
   const suggestionFilePath = `${suggestionFolderPath}/suggestions.json`;
-  const suggestionsListRaw = fs.readFileSync(suggestionFilePath, "utf-8");
+  const suggestionsListRaw = fs.readFileSync(
+    suggestionFilePath,
+    ENCODING_FORMAT
+  );
   const suggestionsList: SuggestionsFile = JSON.parse(suggestionsListRaw);
   suggestionsList[suggestion.user_id] = suggestion;
   fs.writeFileSync(suggestionFilePath, JSON.stringify(suggestionsList));
@@ -49,7 +52,10 @@ export const saveSuggestionInfo = async (suggestion: Suggestion) => {
 
 export const getSuggestionInfo = async (userId: string | number) => {
   const suggestionFilePath = `${suggestionFolderPath}/suggestions.json`;
-  const suggestionsListRaw = fs.readFileSync(suggestionFilePath, "utf-8");
+  const suggestionsListRaw = fs.readFileSync(
+    suggestionFilePath,
+    ENCODING_FORMAT
+  );
   const suggestionsList: SuggestionsFile = JSON.parse(suggestionsListRaw);
   return suggestionsList[Number(userId)];
 };

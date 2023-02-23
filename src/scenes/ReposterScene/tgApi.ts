@@ -6,15 +6,19 @@ interface TgPost {
 }
 
 export const tgRequest = async (method: string, body: object) => {
-  const tgResponse = await axios.post(
-    `https://api.telegram.org/bot${process.env.BOT_TOKEN}/${method}`,
-    body
-  );
-  if (!tgResponse.data.ok) {
-    console.log("tgRequest is not ok", tgResponse.data);
-    return;
+  try {
+    const tgResponse = await axios.post(
+      `https://api.telegram.org/bot${process.env.BOT_TOKEN}/${method}`,
+      body
+    );
+    if (!tgResponse.data.ok) {
+      console.log("tgResponse is not ok", tgResponse.data);
+      return;
+    }
+    return tgResponse.data;
+  } catch (e: any) {
+    console.log("tg request error:", e);
   }
-  return tgResponse.data;
 };
 
 export const makePostToTg = async (post: TgPost) => {
@@ -26,14 +30,12 @@ export const makePostToTg = async (post: TgPost) => {
     };
     return index ? media : { caption: post.text, ...media };
   });
-  const tgResponse = await axios.post(
-    `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMediaGroup`,
-    {
-      chat_id: process.env.TG_GROUP_ID,
-      caption: post.text,
-      media: photos,
-    }
-  );
+  const tgResponse = await tgRequest("sendMediaGroup", {
+    chat_id: process.env.TG_GROUP_ID,
+    caption: post.text,
+    media: photos,
+    parse_mode: "HTML",
+  });
   return tgResponse;
 };
 

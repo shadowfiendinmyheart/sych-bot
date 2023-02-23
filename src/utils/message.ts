@@ -1,6 +1,7 @@
 import { Context, Telegram } from "telegraf";
 import { ExtraEditMessageText } from "telegraf/typings/telegram-types";
 import { Message } from "typegram";
+import awaiter from "./awaiter";
 
 const telegram: Telegram = new Telegram(process.env.BOT_TOKEN as string);
 
@@ -15,7 +16,6 @@ export const deleteUserMessage = async (ctx: Context) => {
   }
 };
 
-// TODO: сделать обновляемое меню
 export const deleteChatMessage = async (message: Message) => {
   try {
     await telegram.deleteMessage(message.chat.id, message.message_id);
@@ -49,4 +49,15 @@ export const editMessage = async (ctx: Context, newText: string) => {
   } catch (e) {
     console.log(e);
   }
+};
+
+export const chatLogger = async (
+  ctx: Context,
+  message: string,
+  timeMessageAlive = 10000
+) => {
+  const errorMessage = await ctx.reply(message);
+  await awaiter(timeMessageAlive);
+  await ctx.deleteMessage(errorMessage.message_id);
+  console.log(message);
 };
