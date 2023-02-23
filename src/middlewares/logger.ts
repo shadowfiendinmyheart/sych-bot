@@ -8,7 +8,7 @@ export const debugLogger = async (ctx: Context, next: callbackFunction) => {
     console.log(
       `new message
        id: ${message.message_id}
-       from: ${message.from.username}\n`
+       from: ${message.from.username}\n`,
     );
   }
   next();

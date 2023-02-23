@@ -21,7 +21,7 @@ export const getSendRoomKeyboard = () =>
 export const savePostInFolder = async (
   href: string,
   folderPath: string,
-  fileName: string
+  fileName: string,
 ) => {
   const response = await axios({ url: href, responseType: "stream" });
   return new Promise((resolve, reject) => {
@@ -41,10 +41,7 @@ export const savePostInFolder = async (
 
 export const saveSuggestionInfo = async (suggestion: Suggestion) => {
   const suggestionFilePath = `${suggestionFolderPath}/suggestions.json`;
-  const suggestionsListRaw = fs.readFileSync(
-    suggestionFilePath,
-    ENCODING_FORMAT
-  );
+  const suggestionsListRaw = fs.readFileSync(suggestionFilePath, ENCODING_FORMAT);
   const suggestionsList: SuggestionsFile = JSON.parse(suggestionsListRaw);
   suggestionsList[suggestion.user_id] = suggestion;
   fs.writeFileSync(suggestionFilePath, JSON.stringify(suggestionsList));
@@ -52,17 +49,14 @@ export const saveSuggestionInfo = async (suggestion: Suggestion) => {
 
 export const getSuggestionInfo = async (userId: string | number) => {
   const suggestionFilePath = `${suggestionFolderPath}/suggestions.json`;
-  const suggestionsListRaw = fs.readFileSync(
-    suggestionFilePath,
-    ENCODING_FORMAT
-  );
+  const suggestionsListRaw = fs.readFileSync(suggestionFilePath, ENCODING_FORMAT);
   const suggestionsList: SuggestionsFile = JSON.parse(suggestionsListRaw);
   return suggestionsList[Number(userId)];
 };
 
 export const changeSuggestionStatus = async (
   userId: string | number,
-  status: SuggestionStatus
+  status: SuggestionStatus,
 ) => {
   const suggestion = await getSuggestionInfo(userId);
   await saveSuggestionInfo({ ...suggestion, status: status });
@@ -83,7 +77,7 @@ export const getSuggestionMediaGroupPost = async (userId: string | number) => {
             caption: existedSuggestionInfo.caption,
           }
         : { media: fileId, type: "photo" };
-    }
+    },
   );
   return mediaGroupPost;
 };

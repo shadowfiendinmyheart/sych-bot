@@ -27,7 +27,7 @@ export const deleteChatMessage = async (message: Message) => {
 export const editChatMessage = async (
   message: Message.TextMessage,
   text: string,
-  keyboard?: ExtraEditMessageText
+  keyboard?: ExtraEditMessageText,
 ) => {
   try {
     await telegram.editMessageText(
@@ -35,7 +35,7 @@ export const editChatMessage = async (
       message.message_id,
       "",
       text,
-      keyboard
+      keyboard,
     );
   } catch (e) {
     console.log(e);
@@ -54,7 +54,7 @@ export const editMessage = async (ctx: Context, newText: string) => {
 export const chatLogger = async (
   ctx: Context,
   message: string,
-  timeMessageAlive = 10000
+  timeMessageAlive = 10000,
 ) => {
   const errorMessage = await ctx.reply(message);
   await awaiter(timeMessageAlive);

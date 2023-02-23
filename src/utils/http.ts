@@ -4,7 +4,7 @@ const http = async (
   url: string,
   method = "GET",
   body?: object | string | null,
-  headers?: object | null
+  headers?: object | null,
 ) => {
   try {
     if (body) {

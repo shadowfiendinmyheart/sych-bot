@@ -3,7 +3,7 @@ import { callbackFunction } from "../types/functions";
 
 export const stopLoadingInlineButton = async (
   ctx: Context,
-  next: callbackFunction
+  next: callbackFunction,
 ) => {
   if (ctx.callbackQuery) {
     await ctx.answerCbQuery();

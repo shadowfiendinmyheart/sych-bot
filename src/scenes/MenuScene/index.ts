@@ -30,10 +30,7 @@ menuScene.action(KeyboardAction.Suggestion, async (ctx) => {
 
   await ctx.scene.enter(SceneAlias.SendRoom);
 
-  await ctx.reply(
-    "Выберите нужный пункт меню",
-    getMenuKeyboard(Boolean(userId))
-  );
+  await ctx.reply("Выберите нужный пункт меню", getMenuKeyboard(Boolean(userId)));
 });
 
 menuScene.action(KeyboardAction.Leaderboard, async (ctx) => {

@@ -9,7 +9,7 @@ export enum KeyboardAction {
 }
 
 const aboutRoomScene = new Scenes.BaseScene<Scenes.SceneContext>(
-  SceneAlias.AboutRoom
+  SceneAlias.AboutRoom,
 );
 
 aboutRoomScene.enter((ctx) => {

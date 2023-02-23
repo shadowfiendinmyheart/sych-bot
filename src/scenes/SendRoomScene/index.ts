@@ -19,9 +19,7 @@ export enum KeyboardAction {
   Delete = "Delete",
 }
 
-const sendRoomScene = new Scenes.BaseScene<Scenes.SceneContext>(
-  SceneAlias.SendRoom
-);
+const sendRoomScene = new Scenes.BaseScene<Scenes.SceneContext>(SceneAlias.SendRoom);
 
 const welcomeSceneText =
   "Отправьте сообщение с фотографиями вашей сычевальни, по желанию можете добавить к вашей записи текст :)";
@@ -29,7 +27,7 @@ sendRoomScene.enter(async (ctx) => {
   const userId = ctx.from?.id;
   if (!userId) {
     await ctx.reply(
-      "Произошла ошибка, попробуйте позже, или обратитесь к администратору"
+      "Произошла ошибка, попробуйте позже, или обратитесь к администратору",
     );
     ctx.scene.enter(SceneAlias.Menu);
     return;
@@ -62,7 +60,7 @@ sendRoomScene.action(KeyboardAction.Send, async (ctx) => {
   const userId = ctx.from?.id;
   if (!userId) {
     await ctx.reply(
-      "Произошла ошибка, попробуйте позже, или обратитесь к администратору"
+      "Произошла ошибка, попробуйте позже, или обратитесь к администратору",
     );
     ctx.scene.enter(SceneAlias.Menu);
     return;

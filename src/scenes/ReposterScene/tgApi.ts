@@ -9,7 +9,7 @@ export const tgRequest = async (method: string, body: object) => {
   try {
     const tgResponse = await axios.post(
       `https://api.telegram.org/bot${process.env.BOT_TOKEN}/${method}`,
-      body
+      body,
     );
     if (!tgResponse.data.ok) {
       console.log("tgResponse is not ok", tgResponse.data);

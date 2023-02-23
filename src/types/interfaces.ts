@@ -2,12 +2,7 @@ export interface IUserData {
   username: string;
 }
 
-export type SuggestionStatus =
-  | "new"
-  | "active"
-  | "canceled"
-  | "accepted"
-  | "posted";
+export type SuggestionStatus = "new" | "active" | "canceled" | "accepted" | "posted";
 
 export interface Suggestion {
   status: SuggestionStatus;

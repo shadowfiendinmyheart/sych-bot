@@ -27,9 +27,7 @@ export enum KeyboardAction {
 
 let interval: NodeJS.Timer;
 
-const reposterScene = new Scenes.BaseScene<Scenes.SceneContext>(
-  SceneAlias.Reposter
-);
+const reposterScene = new Scenes.BaseScene<Scenes.SceneContext>(SceneAlias.Reposter);
 
 reposterScene.enter(async (ctx) => {
   await ctx.reply("Выберите нужный пункт меню", getReposterKeyboard());
@@ -77,12 +75,10 @@ reposterScene.action(KeyboardAction.MakePost, async (ctx) => {
     const maxLikedSortedPosts = posts
       .sort((a, b) => b.likes - a.likes)
       .slice(0, 300);
-    const maxViewedSortedPosts = posts
-      .sort((a, b) => b.view - a.view)
-      .slice(0, 300);
+    const maxViewedSortedPosts = posts.sort((a, b) => b.view - a.view).slice(0, 300);
     const unionPosts = maxLikedSortedPosts
       .filter((maxLiked) =>
-        maxViewedSortedPosts.find((maxViewed) => maxLiked.id === maxViewed.id)
+        maxViewedSortedPosts.find((maxViewed) => maxLiked.id === maxViewed.id),
       )
       .slice(0, 100)
       .reverse();
@@ -103,14 +99,11 @@ reposterScene.action(KeyboardAction.MakePost, async (ctx) => {
       tgPostResponse.result[0].message_id,
       undefined,
       messageWithLink,
-      { parse_mode: "HTML" }
+      { parse_mode: "HTML" },
     );
     increasePostCounter();
     const updatedCounter = getPostCounter();
-    await chatLogger(
-      ctx,
-      `Successul🍀\ncurrent post counter ${updatedCounter}`
-    );
+    await chatLogger(ctx, `Successul🍀\ncurrent post counter ${updatedCounter}`);
   } catch {
     await chatLogger(ctx, "error while sending post...");
   }

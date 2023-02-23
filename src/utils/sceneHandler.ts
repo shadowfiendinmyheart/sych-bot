@@ -1,16 +1,12 @@
-import {
-  BaseScene,
-  SceneContext,
-  SceneSessionData,
-} from "telegraf/typings/scenes";
+import { BaseScene, SceneContext, SceneSessionData } from "telegraf/typings/scenes";
 
 export const unexceptedUserInputHandler = (
-  scene: BaseScene<SceneContext<SceneSessionData>>
+  scene: BaseScene<SceneContext<SceneSessionData>>,
 ) => {
   // TODO: рандомные ответы
   scene.on("audio", async (ctx) => {
     await ctx.replyWithHTML(
-      "Ого, какая крутая песня!\n🎵Я оценил твой музыкальный вкус🎵"
+      "Ого, какая крутая песня!\n🎵Я оценил твой музыкальный вкус🎵",
     );
   });
 
