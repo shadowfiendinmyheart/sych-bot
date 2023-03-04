@@ -9,7 +9,12 @@ import {
   VkPost,
 } from "./vkApi";
 import { makePostToTg } from "./tgApi";
-import { ENCODING_FORMAT, postsInfoPath } from "../../const";
+import {
+  ENCODING_FORMAT,
+  POSTS_FILE_NAME,
+  POSTS_PATH,
+  SORTED_POSTS_FILE_NAME,
+} from "../../const";
 import awaiter from "../../utils/awaiter";
 
 interface PostData {
@@ -28,7 +33,7 @@ export const getReposterKeyboard = () => {
   ]);
 };
 
-export const checkPeriod = 1800000;
+export const CHECK_PERIOD = 1800000;
 
 export const makeRepost = async () => {
   const vkPost = await getVkLastPost();
@@ -77,18 +82,19 @@ export const getPhotosFromVkPost = (vkPost: VkPost) => {
 };
 
 const createFileIfNotExist = (filePath: string) => {
+  console.log("filePath", filePath);
   if (!fs.existsSync(filePath)) {
     fs.writeFile(filePath, "", (error) => {
-      console.log("error:", error);
+      console.log("error in createFileIfNotExist:", error);
     });
   }
 };
 
-export const updatePostsData = async () => {
-  if (!fs.existsSync(postsInfoPath)) {
-    fs.mkdirSync(postsInfoPath);
+export const updateFilePosts = async () => {
+  if (!fs.existsSync(POSTS_PATH)) {
+    fs.mkdirSync(POSTS_PATH);
   }
-  const postsInfoFilePath = `${postsInfoPath}/posts.json`;
+  const postsInfoFilePath = `${POSTS_PATH}/${POSTS_FILE_NAME}`;
   createFileIfNotExist(postsInfoFilePath);
 
   fs.writeFileSync(postsInfoFilePath, JSON.stringify({ posts: [] }));
@@ -118,11 +124,28 @@ export const updatePostsData = async () => {
     fs.writeFileSync(postsInfoFilePath, JSON.stringify(updatedPosts));
     offset += 100;
     await awaiter(10000); // антиспам
+    console.log("updating...\nprogress:", offset);
   } while (newPosts.length > 90);
+
+  const posts = getFilePosts("default");
+  const maxLikedSortedPosts = posts.sort((a, b) => b.likes - a.likes).slice(0, 300);
+  const maxViewedSortedPosts = posts.sort((a, b) => b.view - a.view).slice(0, 300);
+  const unionPosts = maxLikedSortedPosts
+    .filter((maxLiked) =>
+      maxViewedSortedPosts.find((maxViewed) => maxLiked.id === maxViewed.id),
+    )
+    .slice(0, 100)
+    .reverse();
+
+  const sortedPostsFilePath = `${POSTS_PATH}/${SORTED_POSTS_FILE_NAME}`;
+  createFileIfNotExist(sortedPostsFilePath);
+  fs.writeFileSync(sortedPostsFilePath, JSON.stringify({ posts: unionPosts }));
 };
 
-export const getPostsData = (): Array<PostData> => {
-  const postsInfoFilePath = `${postsInfoPath}/posts.json`;
+export const getFilePosts = (postsType: "sorted" | "default"): Array<PostData> => {
+  const postsInfoFilePath = `${POSTS_PATH}/${
+    postsType === "default" ? POSTS_FILE_NAME : SORTED_POSTS_FILE_NAME
+  }`;
 
   const postsRaw = fs.readFileSync(postsInfoFilePath, ENCODING_FORMAT);
   const postsParsed = JSON.parse(postsRaw).posts;
@@ -130,12 +153,24 @@ export const getPostsData = (): Array<PostData> => {
   return postsParsed;
 };
 
-const postCounterFilePath = `${postsInfoPath}/postCounter.txt`;
+const postCounterFilePath = `${POSTS_PATH}/postCounter.txt`;
 
 export const getPostCounter = () => {
   createFileIfNotExist(postCounterFilePath);
   const counter = fs.readFileSync(postCounterFilePath, ENCODING_FORMAT);
   return counter;
+};
+
+export const setPostCounter = (counter: number) => {
+  try {
+    createFileIfNotExist(postCounterFilePath);
+    fs.writeFileSync(postCounterFilePath, String(counter), {
+      encoding: ENCODING_FORMAT,
+    });
+    return true;
+  } catch (e) {
+    return false;
+  }
 };
 
 export const increasePostCounter = () => {

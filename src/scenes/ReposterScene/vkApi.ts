@@ -1,5 +1,5 @@
 import axios from "axios";
-import { checkPeriod } from "./utils";
+import { CHECK_PERIOD } from "./utils";
 
 export interface VkPost {
   id: number;
@@ -54,7 +54,7 @@ export const vkRequest = async (method: string, params?: object) => {
 
 export const checkIsPosted = (postTimestamp: number) => {
   const now = Date.now();
-  return now - postTimestamp * 1000 > checkPeriod;
+  return now - postTimestamp * 1000 > CHECK_PERIOD;
 };
 
 export const checkIsValid = (post: VkPost) => {

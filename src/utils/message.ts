@@ -54,10 +54,10 @@ export const editMessage = async (ctx: Context, newText: string) => {
 export const chatLogger = async (
   ctx: Context,
   message: string,
-  timeMessageAlive = 10000,
+  timeMessageAlive = 60000,
 ) => {
-  const errorMessage = await ctx.reply(message);
+  const infoMessage = await ctx.reply(message);
   await awaiter(timeMessageAlive);
-  await ctx.deleteMessage(errorMessage.message_id);
+  await ctx.deleteMessage(infoMessage.message_id);
   console.log(message);
 };

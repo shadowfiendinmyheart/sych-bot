@@ -11,7 +11,7 @@ import {
 } from "./utils";
 
 import { SceneAlias } from "../../types/scenes";
-import { suggestionFolderPath } from "../../const";
+import { SUGGESTION_PATH } from "../../const";
 
 export enum KeyboardAction {
   Back = "Menu",
@@ -32,7 +32,7 @@ sendRoomScene.enter(async (ctx) => {
     ctx.scene.enter(SceneAlias.Menu);
     return;
   }
-  const userDirectory = `${suggestionFolderPath}/${userId}`;
+  const userDirectory = `${SUGGESTION_PATH}/${userId}`;
 
   if (!fs.existsSync(userDirectory)) {
     fs.mkdirSync(userDirectory);
@@ -81,7 +81,7 @@ sendRoomScene.on("photo", async (ctx) => {
 
   const fileId = photos[3].file_id;
 
-  const userDirectory = `${suggestionFolderPath}/${userId}`;
+  const userDirectory = `${SUGGESTION_PATH}/${userId}`;
 
   const { href } = await ctx.telegram.getFileLink(fileId);
 

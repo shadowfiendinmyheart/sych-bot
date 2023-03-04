@@ -1,14 +1,15 @@
 import { Scenes } from "telegraf";
 
 import {
-  checkPeriod,
+  CHECK_PERIOD,
   getPhotosFromVkPost,
   getPostCounter,
-  getPostsData,
+  getFilePosts,
   getReposterKeyboard,
   increasePostCounter,
   makeRepost,
-  updatePostsData,
+  updateFilePosts,
+  setPostCounter,
 } from "./utils";
 
 import { SceneAlias } from "../../types/scenes";
@@ -42,7 +43,7 @@ reposterScene.action(KeyboardAction.On, async (ctx) => {
 
   interval = setInterval(async () => {
     await makeRepost();
-  }, checkPeriod);
+  }, CHECK_PERIOD);
   ctx.reply("Репостер включился!");
 });
 
@@ -64,26 +65,13 @@ reposterScene.action(KeyboardAction.Back, async (ctx) => {
 reposterScene.action(KeyboardAction.MakePost, async (ctx) => {
   try {
     const counter = Number(getPostCounter());
-    const posts = getPostsData();
-
     if (counter === 100) {
       ctx.reply("100 запись!");
       return;
     }
 
-    // числа взял с потолка, чтобы получалось ~100 записей в пересечении
-    const maxLikedSortedPosts = posts
-      .sort((a, b) => b.likes - a.likes)
-      .slice(0, 300);
-    const maxViewedSortedPosts = posts.sort((a, b) => b.view - a.view).slice(0, 300);
-    const unionPosts = maxLikedSortedPosts
-      .filter((maxLiked) =>
-        maxViewedSortedPosts.find((maxViewed) => maxLiked.id === maxViewed.id),
-      )
-      .slice(0, 100)
-      .reverse();
-
-    const curPost = await getVkPostById(unionPosts[counter].id);
+    const posts = getFilePosts("sorted");
+    const curPost = await getVkPostById(posts[counter].id);
     const postText =
       curPost.text.length > MAX_TG_MESSAGE_LENGTH
         ? curPost.text.slice(0, MAX_TG_MESSAGE_LENGTH) + "..."
@@ -110,8 +98,14 @@ reposterScene.action(KeyboardAction.MakePost, async (ctx) => {
 });
 
 reposterScene.action(KeyboardAction.UpdatePosts, async (ctx) => {
-  await updatePostsData();
-  await chatLogger(ctx, "posts updated!");
+  try {
+    await chatLogger(ctx, "Start updating posts...");
+    await updateFilePosts();
+    setPostCounter(0);
+    await chatLogger(ctx, "posts updated!");
+  } catch (error) {
+    console.log("fail on update posts\nerr:", error);
+  }
 });
 
 export default reposterScene;
