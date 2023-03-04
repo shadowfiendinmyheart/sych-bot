@@ -1,4 +1,5 @@
 import "dotenv/config";
+import * as fs from "fs";
 import { Telegraf, session, Scenes } from "telegraf";
 import { stopLoadingInlineButton } from "./middlewares/inlineKeyboardMiddleware";
 
@@ -10,6 +11,7 @@ import aboutRoomScene from "./scenes/AboutRoomScene";
 import reposterScene from "./scenes/ReposterScene";
 
 import { SceneAlias } from "./types/scenes";
+import { PATHS } from "./const";
 
 if (!process.env.BOT_TOKEN) {
   throw new Error("BOT_TOKEN must be provided!");
@@ -38,6 +40,13 @@ bot.on("message", async (ctx) => {
 });
 
 bot.launch();
+
+// init folders
+PATHS.forEach((path) => {
+  if (!fs.existsSync(path)) {
+    fs.mkdirSync(path, { recursive: true });
+  }
+});
 
 console.log("working . . .");
 

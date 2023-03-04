@@ -82,11 +82,8 @@ export const getPhotosFromVkPost = (vkPost: VkPost) => {
 };
 
 const createFileIfNotExist = (filePath: string) => {
-  console.log("filePath", filePath);
   if (!fs.existsSync(filePath)) {
-    fs.writeFile(filePath, "", (error) => {
-      console.log("error in createFileIfNotExist:", error);
-    });
+    fs.writeFileSync(filePath, "");
   }
 };
 
