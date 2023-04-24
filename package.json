@@ -13,6 +13,7 @@
     "@types/node": "^16.11.6",
     "@typescript-eslint/eslint-plugin": "^5.3.0",
     "@typescript-eslint/parser": "^5.3.0",
+    "cross-env": "^7.0.3",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^8.3.0",
@@ -23,8 +24,8 @@
     "typescript": "^4.9.4"
   },
   "scripts": {
-    "start": "ts-node ./src/index.ts",
-    "dev": "nodemon ./src/index.ts",
+    "start": "cross-env NODE_ENV=production ts-node ./src/index.ts",
+    "dev": "cross-env NODE_ENV=development nodemon ./src/index.ts",
     "lint": "eslint --fix . && echo 'Lint complete.'",
     "prettier": "prettier --write .",
     "test": "echo 'Error: no test specified' && exit "

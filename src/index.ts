@@ -1,4 +1,4 @@
-import "dotenv/config";
+import config from "./config";
 import * as fs from "fs";
 import { Telegraf, session, Scenes } from "telegraf";
 import { stopLoadingInlineButton } from "./middlewares/inlineKeyboardMiddleware";
@@ -13,11 +13,11 @@ import reposterScene from "./scenes/ReposterScene";
 import { SceneAlias } from "./types/scenes";
 import { PATHS } from "./const";
 
-if (!process.env.BOT_TOKEN) {
+if (!config.BOT_TOKEN) {
   throw new Error("BOT_TOKEN must be provided!");
 }
 
-const bot = new Telegraf<Scenes.SceneContext>(process.env.BOT_TOKEN as string);
+const bot = new Telegraf<Scenes.SceneContext>(config.BOT_TOKEN as string);
 const stage = new Scenes.Stage<Scenes.SceneContext>([
   authScene,
   sendRoomScene,

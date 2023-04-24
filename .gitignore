@@ -1,5 +1,7 @@
 node_modules
-.env
+.development.env
+.production.env
 .vscode
 .DS_Store
 public
+data

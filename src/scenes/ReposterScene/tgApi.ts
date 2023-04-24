@@ -1,4 +1,5 @@
 import axios from "axios";
+import config from "../../config";
 
 interface TgPost {
   text?: string;
@@ -8,7 +9,7 @@ interface TgPost {
 export const tgRequest = async (method: string, body: object) => {
   try {
     const tgResponse = await axios.post(
-      `https://api.telegram.org/bot${process.env.BOT_TOKEN}/${method}`,
+      `https://api.telegram.org/bot${config.BOT_TOKEN}/${method}`,
       body,
     );
     if (!tgResponse.data.ok) {
@@ -31,7 +32,7 @@ export const makePostToTg = async (post: TgPost) => {
     return index ? media : { caption: post.text, ...media };
   });
   const tgResponse = await tgRequest("sendMediaGroup", {
-    chat_id: process.env.TG_GROUP_ID,
+    chat_id: config.TG_GROUP_ID,
     caption: post.text,
     media: photos,
     parse_mode: "HTML",

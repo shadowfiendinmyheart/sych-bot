@@ -1,9 +1,10 @@
 import { Context, Telegram } from "telegraf";
 import { ExtraEditMessageText } from "telegraf/typings/telegram-types";
 import { Message } from "typegram";
+import config from "../config";
 import awaiter from "./awaiter";
 
-const telegram: Telegram = new Telegram(process.env.BOT_TOKEN as string);
+const telegram: Telegram = new Telegram(config.BOT_TOKEN as string);
 
 export const deleteUserMessage = async (ctx: Context) => {
   try {
@@ -54,10 +55,15 @@ export const editMessage = async (ctx: Context, newText: string) => {
 export const chatLogger = async (
   ctx: Context,
   message: string,
+  consoleError?: any,
   timeMessageAlive = 60000,
 ) => {
   const infoMessage = await ctx.reply(message);
   await awaiter(timeMessageAlive);
   await ctx.deleteMessage(infoMessage.message_id);
   console.log(message);
+  if (consoleError) {
+    console.log("extended error:\n", consoleError);
+  }
+  console.log("---");
 };

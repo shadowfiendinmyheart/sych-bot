@@ -1,4 +1,5 @@
 import { Scenes } from "telegraf";
+import config from "../../config";
 
 import {
   CHECK_PERIOD,
@@ -76,14 +77,14 @@ reposterScene.action(KeyboardAction.MakePost, async (ctx) => {
       curPost.text.length > MAX_TG_MESSAGE_LENGTH
         ? curPost.text.slice(0, MAX_TG_MESSAGE_LENGTH) + "..."
         : curPost.text;
-    const messageWithLink = `${postText}\n\n<a href="${process.env.VK_POST_LINK}${curPost.id}">Источник с комментариями</a>`;
+    const messageWithLink = `${postText}\n\n<a href="${config.VK_POST_LINK}${curPost.id}">Источник с комментариями</a>`;
     const photos = getPhotosFromVkPost(curPost);
     const tgPostResponse = await makePostToTg({
       text: postText,
       photos: photos,
     });
     await ctx.telegram.editMessageCaption(
-      String(process.env.TG_GROUP_ID),
+      String(config.TG_GROUP_ID),
       tgPostResponse.result[0].message_id,
       undefined,
       messageWithLink,
@@ -92,8 +93,8 @@ reposterScene.action(KeyboardAction.MakePost, async (ctx) => {
     increasePostCounter();
     const updatedCounter = getPostCounter();
     await chatLogger(ctx, `Successul🍀\ncurrent post counter ${updatedCounter}`);
-  } catch {
-    await chatLogger(ctx, "error while sending post...");
+  } catch (error: any) {
+    await chatLogger(ctx, "error while sending post...", error);
   }
 });
 
