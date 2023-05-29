@@ -1,24 +1,31 @@
 import * as fs from "fs";
 import axios from "axios";
 import { Markup } from "telegraf";
-import { KeyboardAction } from "./";
-
-import {
-  Suggestion,
-  SuggestionsFile,
-  SuggestionStatus,
-} from "../../types/interfaces";
+import { Suggestion, SuggestionsFile, SuggestionStatus } from "./interfaces";
 import { ENCODING_FORMAT, SUGGESTION_PATH } from "../../const";
 import { MediaGroup } from "telegraf/typings/telegram-types";
+import { PartialWithRequired } from "../../types/utils";
+
+export enum KeyboardAction {
+  Back = "Back",
+  Photo = "Photo",
+  Description = "Description",
+  Show = "Show",
+  Send = "Send",
+  Delete = "Delete",
+}
 
 export const getSendRoomKeyboard = () =>
   Markup.inlineKeyboard([
-    [Markup.button.callback("Назад", KeyboardAction.Back)],
+    [Markup.button.callback("Добавить фотографии", KeyboardAction.Photo)],
+    [Markup.button.callback("Добавить описание", KeyboardAction.Description)],
+    [Markup.button.callback("Посмотреть", KeyboardAction.Show)],
     [Markup.button.callback("Отправить", KeyboardAction.Send)],
     [Markup.button.callback("Удалить", KeyboardAction.Delete)],
+    [Markup.button.callback("Назад", KeyboardAction.Back)],
   ]);
 
-export const savePostInFolder = async (
+export const savePhotoInFolder = async (
   href: string,
   folderPath: string,
   fileName: string,
@@ -42,8 +49,8 @@ export const savePostInFolder = async (
 export const saveSuggestionInfo = async (suggestion: Suggestion) => {
   const suggestionFilePath = `${SUGGESTION_PATH}/suggestions.json`;
   const suggestionsListRaw = fs.readFileSync(suggestionFilePath, ENCODING_FORMAT);
-  const suggestionsList: SuggestionsFile = JSON.parse(suggestionsListRaw);
-  suggestionsList[suggestion.user_id] = suggestion;
+  const suggestionsList: SuggestionsFile = await JSON.parse(suggestionsListRaw);
+  suggestionsList[suggestion.userId] = suggestion;
   fs.writeFileSync(suggestionFilePath, JSON.stringify(suggestionsList));
 };
 
@@ -54,12 +61,11 @@ export const getSuggestionInfo = async (userId: string | number) => {
   return suggestionsList[Number(userId)];
 };
 
-export const changeSuggestionStatus = async (
-  userId: string | number,
-  status: SuggestionStatus,
+export const updateSuggestionInfo = async (
+  suggestion: PartialWithRequired<Suggestion, "userId">,
 ) => {
-  const suggestion = await getSuggestionInfo(userId);
-  await saveSuggestionInfo({ ...suggestion, status: status });
+  const oldSuggestion = await getSuggestionInfo(suggestion.userId);
+  await saveSuggestionInfo({ ...oldSuggestion, ...suggestion });
 };
 
 export const getSuggestionMediaGroupPost = async (userId: string | number) => {

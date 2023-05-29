@@ -26,11 +26,7 @@ menuScene.enter(async (ctx) => {
 });
 
 menuScene.action(KeyboardAction.Suggestion, async (ctx) => {
-  const userId = ctx.from?.id;
-
   await ctx.scene.enter(SceneAlias.SendRoom);
-
-  await ctx.reply("Выберите нужный пункт меню", getMenuKeyboard(Boolean(userId)));
 });
 
 menuScene.action(KeyboardAction.Leaderboard, async (ctx) => {

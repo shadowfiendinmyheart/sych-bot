@@ -26,6 +26,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production ts-node ./src/index.ts",
     "dev": "cross-env NODE_ENV=development nodemon ./src/index.ts",
+    "devNode": "cross-env NODE_ENV=development ts-node ./src/index.ts",
     "lint": "eslint --fix . && echo 'Lint complete.'",
     "prettier": "prettier --write .",
     "test": "echo 'Error: no test specified' && exit "

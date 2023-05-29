@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { Context, Markup } from "telegraf";
+import { Markup } from "telegraf";
 import { KeyboardAction } from ".";
 import {
   checkIsPosted,
@@ -36,32 +36,32 @@ export const getReposterKeyboard = () => {
 export const CHECK_PERIOD = 1800000;
 
 export const makeRepost = async () => {
-  const vkPost = await getVkLastPost();
-  const isPosted = checkIsPosted(Number(vkPost.date));
-  const isValidToPost = checkIsValid(vkPost);
+  try {
+    const vkPost = await getVkLastPost();
+    const isPosted = checkIsPosted(Number(vkPost.date));
+    const isValidToPost = checkIsValid(vkPost);
 
-  if (!isValidToPost) {
-    console.log(`Post ${vkPost.id} is not valid`);
-    return;
-  }
+    if (!isValidToPost) {
+      console.log(`Post ${vkPost.id} is not valid`);
+      return;
+    }
 
-  if (isPosted) {
-    console.log(
-      Date.now(),
-      `\nid: ${vkPost.id}\ntime: ${Number(vkPost.date) * 1000}\n already posted\n`,
-    );
-    return;
-  }
+    if (isPosted) {
+      console.log(
+        Date.now(),
+        `\nid: ${vkPost.id}\ntime: ${Number(vkPost.date) * 1000}\n already posted\n`,
+      );
+      return;
+    }
 
-  const photosUrl = getPhotosFromVkPost(vkPost);
+    const photosUrl = getPhotosFromVkPost(vkPost);
 
-  const tgResponse = await makePostToTg({
-    text: vkPost.text,
-    photos: photosUrl,
-  });
-  if (!tgResponse) return;
-  if (!tgResponse.data.ok) {
-    console.log("Error post to tg:", tgResponse.data);
+    await makePostToTg({
+      text: vkPost.text,
+      photos: photosUrl,
+    });
+  } catch (error) {
+    console.log("makeRepost error:", error);
   }
 };
 
@@ -165,7 +165,8 @@ export const setPostCounter = (counter: number) => {
       encoding: ENCODING_FORMAT,
     });
     return true;
-  } catch (e) {
+  } catch (error) {
+    console.log("setPostCounter error:", error);
     return false;
   }
 };

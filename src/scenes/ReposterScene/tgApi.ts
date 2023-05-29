@@ -22,7 +22,7 @@ export const tgRequest = async (method: string, body: object) => {
   }
 };
 
-export const makePostToTg = async (post: TgPost) => {
+export const makePostToTg = async (post: TgPost, chatId?: string) => {
   if (post.photos?.length === 0) return;
   const photos = post.photos.map((photo, index) => {
     const media = {
@@ -32,7 +32,7 @@ export const makePostToTg = async (post: TgPost) => {
     return index ? media : { caption: post.text, ...media };
   });
   const tgResponse = await tgRequest("sendMediaGroup", {
-    chat_id: config.TG_GROUP_ID,
+    chat_id: chatId || config.TG_GROUP_ID,
     caption: post.text,
     media: photos,
     parse_mode: "HTML",

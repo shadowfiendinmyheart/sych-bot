@@ -6,6 +6,7 @@ import awaiter from "./awaiter";
 
 const telegram: Telegram = new Telegram(config.BOT_TOKEN as string);
 
+// TODO привести все ошибки в проекте к одному виду
 export const deleteUserMessage = async (ctx: Context) => {
   try {
     if (ctx.message) {
@@ -58,12 +59,12 @@ export const chatLogger = async (
   consoleError?: any,
   timeMessageAlive = 60000,
 ) => {
-  const infoMessage = await ctx.reply(message);
-  await awaiter(timeMessageAlive);
-  await ctx.deleteMessage(infoMessage.message_id);
   console.log(message);
   if (consoleError) {
     console.log("extended error:\n", consoleError);
   }
   console.log("---");
+  const infoMessage = await ctx.reply(message);
+  await awaiter(timeMessageAlive);
+  await ctx.deleteMessage(infoMessage.message_id);
 };
