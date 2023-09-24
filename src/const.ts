@@ -10,3 +10,7 @@ export const SORTED_POSTS_FILE_NAME = "sortedPosts.json";
 export const PATHS = [SUGGESTION_PATH, POSTS_PATH];
 
 export const ENCODING_FORMAT = "utf-8";
+
+export const ERRORS = {
+  EMPTY_SUGGESTION: "empty suggestion",
+};

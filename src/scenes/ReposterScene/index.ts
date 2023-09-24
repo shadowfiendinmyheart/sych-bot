@@ -14,8 +14,8 @@ import {
 } from "./utils";
 
 import { SceneAlias } from "../../types/scenes";
-import { getVkPostById } from "./vkApi";
-import { makePostToTg } from "./tgApi";
+import { getVkPostById } from "../../services/api/vkApi";
+import { makePostToTg } from "../../services/api/tgApi";
 import { MAX_TG_MESSAGE_LENGTH } from "../../const";
 import { chatLogger } from "../../utils/message";
 

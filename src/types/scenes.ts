@@ -5,4 +5,5 @@ export enum SceneAlias {
   DescriptionSuggestion = "descriptionSuggestion",
   AboutRoom = "aboutRoom",
   Reposter = "reposter",
+  Admin = "admin",
 }

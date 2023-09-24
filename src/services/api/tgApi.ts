@@ -1,9 +1,18 @@
 import axios from "axios";
+import { Markup } from "telegraf";
+import { InlineKeyboardMarkup } from "telegraf/typings/core/types/typegram";
 import config from "../../config";
 
 interface TgPost {
   text?: string;
-  photos: string[];
+  photos?: string[];
+}
+
+interface SendMessageParams {
+  chatId: number;
+  text: string;
+  parseMode?: string;
+  replyMarkup?: Markup.Markup<InlineKeyboardMarkup>;
 }
 
 export const tgRequest = async (method: string, body: object) => {
@@ -23,13 +32,12 @@ export const tgRequest = async (method: string, body: object) => {
 };
 
 export const makePostToTg = async (post: TgPost, chatId?: string) => {
-  if (post.photos?.length === 0) return;
-  const photos = post.photos.map((photo, index) => {
+  const photos = post.photos?.map((photo, index) => {
     const media = {
       type: "photo",
       media: photo,
     };
-    return index ? media : { caption: post.text, ...media };
+    return index !== 0 ? media : { caption: post.text, ...media };
   });
   const tgResponse = await tgRequest("sendMediaGroup", {
     chat_id: chatId || config.TG_GROUP_ID,
@@ -40,6 +48,12 @@ export const makePostToTg = async (post: TgPost, chatId?: string) => {
   return tgResponse;
 };
 
-export const addingPostText = (text: string, postId: number) => {
-  return `${text} hello world </br> link: <a href="https://vk.com/your_sychevalnya?w=wall-33326094_${postId}">Link</a>`;
+export const makeMessageToTg = async (params: SendMessageParams) => {
+  const tgResponse = await tgRequest("sendMessage", {
+    ...params,
+    parse_mode: params.parseMode || "HTML",
+    chat_id: params.chatId,
+    reply_markup: params.replyMarkup?.reply_markup,
+  });
+  return tgResponse;
 };

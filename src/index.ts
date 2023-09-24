@@ -11,6 +11,7 @@ import aboutRoomScene from "./scenes/AboutRoomScene";
 import reposterScene from "./scenes/ReposterScene";
 import photoSuggestionScene from "./scenes/PhotoSuggestionScene";
 import descriptionSuggestionScene from "./scenes/DescriptionSuggestionScene";
+import adminScene from "./scenes/AdminScene";
 
 import { SceneAlias } from "./types/scenes";
 import { PATHS } from "./const";
@@ -27,6 +28,7 @@ const stage = new Scenes.Stage<Scenes.SceneContext>([
   reposterScene,
   photoSuggestionScene,
   descriptionSuggestionScene,
+  adminScene,
 ]);
 
 bot.use(debugLogger);
@@ -53,6 +55,8 @@ PATHS.forEach((path) => {
     fs.mkdirSync(path, { recursive: true });
   }
 });
+
+// TODO: init files
 
 // Enable graceful stop
 process.once("SIGINT", () => bot.stop("SIGINT"));

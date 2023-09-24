@@ -2,8 +2,8 @@ import { Scenes } from "telegraf";
 
 import { SceneAlias } from "../../types/scenes";
 import { MAX_TG_MESSAGE_LENGTH } from "../../const";
-import { updateSuggestionInfo } from "../SendRoomScene/utils";
 import { userErrorHanlder } from "../utils";
+import { updateSuggestionInfo } from "../../services/suggestion";
 
 enum DescriptionKeyboard {
   Done = "Готово",
@@ -49,10 +49,9 @@ descriptionSuggestionScene.on("text", async (ctx) => {
       return;
     }
 
-    // TODO: description vs caption
     await updateSuggestionInfo({ userId, caption: text });
     await ctx.reply(
-      "Описание успешно сохранено.\nЕсли хотите его изменить, просто отправьте сообщение ещё раз",
+      "Описание успешно сохранено.\nЕсли хотите его изменить, просто отправьте сообщение ещё раз\nНажмите 'Назад', чтобы вернуться",
     );
   } catch (error) {
     userErrorHanlder(ctx, error);

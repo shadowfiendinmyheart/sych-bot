@@ -1,6 +1,6 @@
 import axios from "axios";
 import config from "../../config";
-import { CHECK_PERIOD } from "./utils";
+import { CHECK_PERIOD } from "../../scenes/ReposterScene/utils";
 
 export interface VkPost {
   id: number;
@@ -43,10 +43,11 @@ export const vkRequest = async (method: string, params?: object) => {
         ...params,
       },
     });
+
     if (vkResponse.statusText !== "OK") {
-      console.log("vkResponse is not ok", vkResponse.data.response);
-      return;
+      throw Error(`vkResponse is not ok ${vkResponse.data.response}`);
     }
+
     return vkResponse.data.response;
   } catch (e: any) {
     console.log("vk request error:", e);
@@ -59,6 +60,7 @@ export const checkIsPosted = (postTimestamp: number) => {
 };
 
 export const checkIsValid = (post: VkPost) => {
+  // TODO: check actual response
   if (post.marked_as_ads || post.post_type !== "post") return false;
   return true;
 };

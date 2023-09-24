@@ -7,8 +7,8 @@ import {
   getVkLastPost,
   getVkPosts,
   VkPost,
-} from "./vkApi";
-import { makePostToTg } from "./tgApi";
+} from "../../services/api/vkApi";
+import { makePostToTg } from "../../services/api/tgApi";
 import {
   ENCODING_FORMAT,
   POSTS_FILE_NAME,

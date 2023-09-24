@@ -33,8 +33,9 @@ menuScene.action(KeyboardAction.Leaderboard, async (ctx) => {
   // enter to leaderboard scene
 });
 
+// enter to admin scene
 menuScene.action(KeyboardAction.Admin, async (ctx) => {
-  // enter to admin scene
+  await ctx.scene.enter(SceneAlias.Admin);
 });
 
 // enter to reposter scene

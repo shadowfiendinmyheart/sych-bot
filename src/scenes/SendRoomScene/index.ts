@@ -1,12 +1,14 @@
 import { Scenes } from "telegraf";
-import {
-  getSuggestionInfo,
-  getSendRoomKeyboard,
-  KeyboardAction,
-  updateSuggestionInfo,
-} from "./utils";
+import { getSendRoomKeyboard, KeyboardAction } from "./utils";
 import { SceneAlias } from "../../types/scenes";
-import { makePostToTg } from "../ReposterScene/tgApi";
+import { makePostToTg } from "../../services/api/tgApi";
+import {
+  checkSuggestionInfo,
+  deleteSuggestionInfo,
+  getSuggestionInfo,
+  saveSuggestionInfo,
+  updateSuggestionInfo,
+} from "../../services/suggestion";
 import { userErrorHanlder } from "../utils";
 
 const sendRoomScene = new Scenes.BaseScene<Scenes.SceneContext>(SceneAlias.SendRoom);
@@ -14,7 +16,25 @@ const sendRoomScene = new Scenes.BaseScene<Scenes.SceneContext>(SceneAlias.SendR
 const welcomeSceneText = "Выберите нужный пункт меню";
 
 sendRoomScene.enter(async (ctx) => {
-  await ctx.reply(welcomeSceneText, getSendRoomKeyboard());
+  try {
+    await ctx.reply(welcomeSceneText, getSendRoomKeyboard());
+
+    const userId = ctx.callbackQuery?.from.id || 0;
+    const username = ctx.callbackQuery?.from.username || "";
+    const isSuggestionExist = await checkSuggestionInfo(userId);
+    if (!isSuggestionExist) {
+      await saveSuggestionInfo({
+        fileIds: [],
+        status: "draft",
+        caption: "",
+        userId,
+        username,
+      });
+    }
+  } catch (error) {
+    userErrorHanlder(ctx, error);
+    ctx.scene.enter(SceneAlias.Menu);
+  }
 });
 
 // Назад
@@ -30,6 +50,7 @@ sendRoomScene.action(KeyboardAction.Show, async (ctx) => {
   try {
     const suggestionInfo = await getSuggestionInfo(userId);
     await ctx.reply(`Ваша предложка:`);
+    // TODO: fix empty photos
     await makePostToTg(
       { photos: suggestionInfo.fileIds, text: suggestionInfo.caption },
       String(chatId),
@@ -52,9 +73,31 @@ sendRoomScene.action(KeyboardAction.Description, async (ctx) => {
 
 // Отправить
 sendRoomScene.action(KeyboardAction.Send, async (ctx) => {
-  const userId = ctx.from?.id || 0;
-  updateSuggestionInfo({ userId: userId, status: "new" });
-  await ctx.reply("Отправить");
+  try {
+    const userId = ctx.from?.id || 0;
+
+    const isSended = (await getSuggestionInfo(userId)).status === "new";
+    if (isSended) {
+      await ctx.reply("Предложка находится в обработке...");
+      return;
+    }
+
+    await updateSuggestionInfo({ userId: userId, status: "new" });
+    await ctx.reply("Предложка отправлена");
+  } catch (error) {
+    userErrorHanlder(ctx, error);
+  }
+});
+
+// Удалить
+sendRoomScene.action(KeyboardAction.Delete, async (ctx) => {
+  try {
+    const userId = ctx.from?.id || 0;
+    await deleteSuggestionInfo(userId);
+    await ctx.reply("Предложка удалена");
+  } catch (error) {
+    userErrorHanlder(ctx, error);
+  }
 });
 
 sendRoomScene.on("text", async (ctx) => {
