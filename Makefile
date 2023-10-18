@@ -21,6 +21,6 @@ stop:
 delete:
 	docker container rm ${CONTAINER_NAME}
 logs:
-	docker logs ${CONTAINER_NAME}
+	docker logs --follow ${CONTAINER_NAME}
 bash:
 	docker exec -it ${CONTAINER_NAME} bash

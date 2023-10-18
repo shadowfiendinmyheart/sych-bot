@@ -9,7 +9,7 @@ interface TgPost {
 }
 
 interface SendMessageParams {
-  chatId: number;
+  chatId: string;
   text: string;
   parseMode?: string;
   replyMarkup?: Markup.Markup<InlineKeyboardMarkup>;

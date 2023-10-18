@@ -60,7 +60,6 @@ export const checkIsPosted = (postTimestamp: number) => {
 };
 
 export const checkIsValid = (post: VkPost) => {
-  // TODO: check actual response
   if (post.marked_as_ads || post.post_type !== "post") return false;
   return true;
 };

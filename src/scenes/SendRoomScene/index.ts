@@ -27,6 +27,7 @@ sendRoomScene.enter(async (ctx) => {
         fileIds: [],
         status: "draft",
         caption: "",
+        createdAt: 0,
         userId,
         username,
       });
@@ -43,6 +44,7 @@ sendRoomScene.action(KeyboardAction.Back, async (ctx) => {
 });
 
 // Показать предложку
+// TODO не показывать опубликованные предложки
 sendRoomScene.action(KeyboardAction.Show, async (ctx) => {
   const chatId = ctx.chat?.id || 0;
   const userId = ctx.update.callback_query.from.id;
@@ -50,7 +52,11 @@ sendRoomScene.action(KeyboardAction.Show, async (ctx) => {
   try {
     const suggestionInfo = await getSuggestionInfo(userId);
     await ctx.reply(`Ваша предложка:`);
-    // TODO: fix empty photos
+    if (suggestionInfo.fileIds.length === 0 && suggestionInfo.caption.length === 0) {
+      await ctx.reply("Тут пусто... Сначала нужно добавить фотографии или описание");
+      return;
+    }
+
     await makePostToTg(
       { photos: suggestionInfo.fileIds, text: suggestionInfo.caption },
       String(chatId),
@@ -75,8 +81,14 @@ sendRoomScene.action(KeyboardAction.Description, async (ctx) => {
 sendRoomScene.action(KeyboardAction.Send, async (ctx) => {
   try {
     const userId = ctx.from?.id || 0;
+    const suggestion = await getSuggestionInfo(userId);
 
-    const isSended = (await getSuggestionInfo(userId)).status === "new";
+    if (suggestion.fileIds.length === 0) {
+      await ctx.reply("Сначала нужно добавить фотографии");
+      return;
+    }
+
+    const isSended = suggestion.status === "new";
     if (isSended) {
       await ctx.reply("Предложка находится в обработке...");
       return;

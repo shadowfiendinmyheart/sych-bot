@@ -6,7 +6,6 @@ import awaiter from "./awaiter";
 
 const telegram: Telegram = new Telegram(config.BOT_TOKEN as string);
 
-// TODO привести все ошибки в проекте к одному виду
 export const deleteUserMessage = async (ctx: Context) => {
   try {
     if (ctx.message) {

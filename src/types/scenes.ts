@@ -3,7 +3,7 @@ export enum SceneAlias {
   SendRoom = "sendRoom",
   PhotoSuggestion = "photoSuggestion",
   DescriptionSuggestion = "descriptionSuggestion",
-  AboutRoom = "aboutRoom",
   Reposter = "reposter",
   Admin = "admin",
+  Refuse = "refuse",
 }

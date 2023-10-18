@@ -7,11 +7,11 @@ import { debugLogger } from "./middlewares/logger";
 
 import authScene from "./scenes/MenuScene";
 import sendRoomScene from "./scenes/SendRoomScene";
-import aboutRoomScene from "./scenes/AboutRoomScene";
 import reposterScene from "./scenes/ReposterScene";
 import photoSuggestionScene from "./scenes/PhotoSuggestionScene";
 import descriptionSuggestionScene from "./scenes/DescriptionSuggestionScene";
 import adminScene from "./scenes/AdminScene";
+import refuseScene from "./scenes/RefuseScene";
 
 import { SceneAlias } from "./types/scenes";
 import { PATHS } from "./const";
@@ -24,11 +24,11 @@ const bot = new Telegraf<Scenes.SceneContext>(config.BOT_TOKEN as string);
 const stage = new Scenes.Stage<Scenes.SceneContext>([
   authScene,
   sendRoomScene,
-  aboutRoomScene,
   reposterScene,
   photoSuggestionScene,
   descriptionSuggestionScene,
   adminScene,
+  refuseScene,
 ]);
 
 bot.use(debugLogger);

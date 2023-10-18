@@ -11,6 +11,7 @@ export enum KeyboardAction {
   Delete = "Delete",
 }
 
+// TODO make keyboard for empty suggestion
 export const getSendRoomKeyboard = () =>
   Markup.inlineKeyboard([
     [Markup.button.callback("Добавить фотографии", KeyboardAction.Photo)],
