@@ -1,6 +1,6 @@
 export enum SceneAlias {
   Menu = "menu",
-  SendRoom = "sendRoom",
+  Suggestion = "suggestion",
   PhotoSuggestion = "photoSuggestion",
   DescriptionSuggestion = "descriptionSuggestion",
   Reposter = "reposter",

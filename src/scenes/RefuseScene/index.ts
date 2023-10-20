@@ -1,9 +1,10 @@
 import { Scenes } from "telegraf";
-import { makeMessageToTg, makePostToTg } from "../../services/api/tgApi";
+import { makePostToTg } from "../../services/api/tgApi";
 import { updateSuggestionInfo } from "../../services/suggestion";
 
 import { SceneAlias } from "../../types/scenes";
 import { chatLogger } from "../../utils/message";
+import { errorHandler } from "../utils";
 import {
   getNextSuggestionKeyboard,
   getPreparedForRefuseSuggestion,
@@ -41,6 +42,7 @@ refuseScene.enter(async (ctx) => {
     await ctx.reply("Что будем делать?", getRefuseMenuKeyboard());
   } catch (error) {
     await chatLogger(ctx, "Произошла ошибка...", error);
+    errorHandler(ctx, error);
   }
 });
 
@@ -59,12 +61,16 @@ refuseScene.on("text", async (ctx) => {
 });
 
 refuseScene.action(RefuseKeyboard.GetNextSuggestion, async (ctx) => {
-  const suggestion = await getPreparedForRefuseSuggestion();
-  await ctx.reply("Отклоняемый пост:");
-  await makePostToTg(
-    { photos: suggestion.fileIds, text: suggestion.caption },
-    String(suggestion.userId),
-  );
+  try {
+    const suggestion = await getPreparedForRefuseSuggestion();
+    await ctx.reply("Отклоняемый пост:");
+    await makePostToTg(
+      { photos: suggestion.fileIds, text: suggestion.caption },
+      String(suggestion.userId),
+    );
+  } catch (error) {
+    await chatLogger(ctx, "Произошла ошибка...", error);
+  }
 });
 
 refuseScene.action(RefuseKeyboard.ReturnSuggestion, async (ctx) => {

@@ -13,4 +13,5 @@ export const ENCODING_FORMAT = "utf-8";
 
 export const ERRORS = {
   EMPTY_SUGGESTION: "empty suggestion",
+  ADMIN_EMPTY_SUGGESTION: "adming empty suggestion",
 };

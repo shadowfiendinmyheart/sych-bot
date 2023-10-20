@@ -2,7 +2,7 @@ import { Scenes } from "telegraf";
 
 import { SceneAlias } from "../../types/scenes";
 import { MAX_TG_MESSAGE_LENGTH } from "../../const";
-import { userErrorHanlder } from "../utils";
+import { errorHandler } from "../utils";
 import { updateSuggestionInfo } from "../../services/suggestion";
 
 enum DescriptionKeyboard {
@@ -40,12 +40,12 @@ descriptionSuggestionScene.on("text", async (ctx) => {
     if (text === DescriptionKeyboard.Delete) {
       await updateSuggestionInfo({ userId, caption: "" });
       await ctx.reply("Описание удалено");
-      await ctx.scene.enter(SceneAlias.SendRoom);
+      await ctx.scene.enter(SceneAlias.Suggestion);
       return;
     }
 
     if (text === DescriptionKeyboard.Back) {
-      await ctx.scene.enter(SceneAlias.SendRoom);
+      await ctx.scene.enter(SceneAlias.Suggestion);
       return;
     }
 
@@ -54,7 +54,7 @@ descriptionSuggestionScene.on("text", async (ctx) => {
       "Описание успешно сохранено.\nЕсли хотите его изменить, просто отправьте сообщение ещё раз\nНажмите 'Назад', чтобы вернуться",
     );
   } catch (error) {
-    userErrorHanlder(ctx, error);
+    errorHandler(ctx, error);
   }
 });
 

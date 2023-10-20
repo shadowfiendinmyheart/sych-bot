@@ -1,5 +1,6 @@
 import { Markup } from "telegraf";
 import { RefuseKeyboard } from ".";
+import { ERRORS } from "../../const";
 import { makeMessageToTg, makePostToTg } from "../../services/api/tgApi";
 import {
   getSuggestionsByStatus,
@@ -40,9 +41,7 @@ export const getPreparedForRefuseSuggestion = async () => {
   );
 
   if (!preparedForRefuseSuggestions[0]) {
-    // TODO: стандартизировать ошибку
-    // scenes/utils.ts
-    throw Error("Чёт тут пустовато...");
+    throw Error(ERRORS.ADMIN_EMPTY_SUGGESTION);
   }
 
   return preparedForRefuseSuggestions[0];

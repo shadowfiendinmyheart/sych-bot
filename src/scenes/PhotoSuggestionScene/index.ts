@@ -35,7 +35,7 @@ photoSuggestionScene.on("photo", async (ctx) => {
   const photos = ctx.message.photo;
   const bestSizeFile = photos[photos.length - 1];
   const bestSizeFileId = bestSizeFile.file_id;
-  let userPhotos = userPhotosBuffer[String(userId)] || [];
+  const userPhotos = userPhotosBuffer[String(userId)] || [];
 
   userPhotos.push(bestSizeFileId);
   userPhotosBuffer[String(userId)] = userPhotos;
@@ -50,12 +50,12 @@ photoSuggestionScene.on("text", async (ctx) => {
     await updateSuggestionInfo({ userId, fileIds: [] });
     await ctx.reply("Фотографии удалены");
 
-    await ctx.scene.enter(SceneAlias.SendRoom);
+    await ctx.scene.enter(SceneAlias.Suggestion);
     return;
   }
 
   if (text === PhotoKeyboard.Back) {
-    await ctx.scene.enter(SceneAlias.SendRoom);
+    await ctx.scene.enter(SceneAlias.Suggestion);
     return;
   }
 });

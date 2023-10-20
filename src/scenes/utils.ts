@@ -1,10 +1,15 @@
 import { Context } from "telegraf";
 import { ERRORS } from "../const";
 
-export const userErrorHanlder = async (ctx: Context, error: any) => {
+export const errorHandler = async (ctx: Context, error: any) => {
   switch (error.message) {
     case ERRORS.EMPTY_SUGGESTION: {
       await ctx.reply("У вас нет предложки");
+      break;
+    }
+
+    case ERRORS.ADMIN_EMPTY_SUGGESTION: {
+      await ctx.reply("Тут больше ничего нет...");
       break;
     }
 

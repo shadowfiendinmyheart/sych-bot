@@ -58,12 +58,16 @@ export const chatLogger = async (
   consoleError?: any,
   timeMessageAlive = 60000,
 ) => {
-  console.log(message);
-  if (consoleError) {
-    console.log("extended error:\n", consoleError);
+  try {
+    console.log(message);
+    if (consoleError) {
+      console.log("extended error:\n", consoleError);
+    }
+    console.log("---");
+    const infoMessage = await ctx.reply(message);
+    await awaiter(timeMessageAlive);
+    await ctx.deleteMessage(infoMessage.message_id);
+  } catch (error) {
+    console.log("chat logger error:", error);
   }
-  console.log("---");
-  const infoMessage = await ctx.reply(message);
-  await awaiter(timeMessageAlive);
-  await ctx.deleteMessage(infoMessage.message_id);
 };

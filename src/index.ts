@@ -6,7 +6,7 @@ import { stopLoadingInlineButton } from "./middlewares/inlineKeyboardMiddleware"
 import { debugLogger } from "./middlewares/logger";
 
 import authScene from "./scenes/MenuScene";
-import sendRoomScene from "./scenes/SendRoomScene";
+import suggestionScene from "./scenes/SuggestionScene";
 import reposterScene from "./scenes/ReposterScene";
 import photoSuggestionScene from "./scenes/PhotoSuggestionScene";
 import descriptionSuggestionScene from "./scenes/DescriptionSuggestionScene";
@@ -23,7 +23,7 @@ if (!config.BOT_TOKEN) {
 const bot = new Telegraf<Scenes.SceneContext>(config.BOT_TOKEN as string);
 const stage = new Scenes.Stage<Scenes.SceneContext>([
   authScene,
-  sendRoomScene,
+  suggestionScene,
   reposterScene,
   photoSuggestionScene,
   descriptionSuggestionScene,

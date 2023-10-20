@@ -15,7 +15,8 @@ import { chatLogger } from "../../utils/message";
 import config from "../../config";
 
 export enum MenuKeyboardAction {
-  GetSuggestion = "GetSuggestion",
+  GetSuggestions = "GetSuggestions",
+  GetPreparedForRefuseSuggestions = "GetSuggestions",
   Back = "Back",
 }
 
@@ -31,7 +32,7 @@ adminScene.enter(async (ctx) => {
   await ctx.reply("admin menu 😎🤙🏻", getAdminKeyboard());
 });
 
-adminScene.action(MenuKeyboardAction.GetSuggestion, async (ctx) => {
+adminScene.action(MenuKeyboardAction.GetSuggestions, async (ctx) => {
   const chatId = ctx.chat?.id || 0;
   const newSuggestions = await getSuggestionsByStatus("new");
   if (newSuggestions.length === 0) {
@@ -48,6 +49,13 @@ adminScene.action(MenuKeyboardAction.GetSuggestion, async (ctx) => {
 
   await ctx.reply("Норм?", getResolveSuggestionKeyboard());
 });
+
+adminScene.action(
+  MenuKeyboardAction.GetPreparedForRefuseSuggestions,
+  async (ctx) => {
+    await ctx.scene.enter(SceneAlias.Refuse);
+  },
+);
 
 adminScene.action(MenuKeyboardAction.Back, async (ctx) => {
   await ctx.scene.enter(SceneAlias.Menu);
@@ -89,7 +97,7 @@ adminScene.action(SuggestionKeyboardAction.Refuse, async (ctx) => {
       status: "preparedForRefuse",
       userId: refusedSuggestion.userId,
     });
-    
+
     await ctx.scene.enter(SceneAlias.Refuse);
   } catch (error) {
     await chatLogger(ctx, "Произошла ошибка...", error);

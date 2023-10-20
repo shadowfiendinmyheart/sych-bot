@@ -26,7 +26,7 @@ menuScene.enter(async (ctx) => {
 });
 
 menuScene.action(KeyboardAction.Suggestion, async (ctx) => {
-  await ctx.scene.enter(SceneAlias.SendRoom);
+  await ctx.scene.enter(SceneAlias.Suggestion);
 });
 
 menuScene.action(KeyboardAction.Leaderboard, async (ctx) => {

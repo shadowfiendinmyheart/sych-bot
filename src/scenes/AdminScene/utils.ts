@@ -3,7 +3,18 @@ import { MenuKeyboardAction, SuggestionKeyboardAction } from ".";
 
 export const getAdminKeyboard = () => {
   return Markup.inlineKeyboard([
-    [Markup.button.callback("Получить предложку", MenuKeyboardAction.GetSuggestion)],
+    [
+      Markup.button.callback(
+        "Смотреть предложку",
+        MenuKeyboardAction.GetSuggestions,
+      ),
+    ],
+    [
+      Markup.button.callback(
+        "Смотреть отказы предложки",
+        MenuKeyboardAction.GetPreparedForRefuseSuggestions,
+      ),
+    ],
     [Markup.button.callback("Назад", MenuKeyboardAction.Back)],
   ]);
 };
@@ -19,7 +30,7 @@ export const getResolveSuggestionKeyboard = () => {
 
 export const getNextSuggestionKeyboard = () => {
   return Markup.inlineKeyboard([
-    [Markup.button.callback("✅", MenuKeyboardAction.GetSuggestion)],
+    [Markup.button.callback("✅", MenuKeyboardAction.GetSuggestions)],
     [Markup.button.callback("В главное меню", MenuKeyboardAction.Back)],
   ]);
 };

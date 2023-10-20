@@ -5,7 +5,7 @@ import {
   saveSuggestionInfo,
   updateSuggestionInfo,
 } from "../../services/suggestion";
-import { userErrorHanlder } from "../utils";
+import { errorHanlder } from "../utils";
 
 export const userPhotosBuffer: Record<string, string[]> = {};
 
@@ -43,7 +43,7 @@ export const uploadPhoto = async (ctx: any, userId: number, photoIds: string[]) 
       photosLength > 1 ? `Ваши фотографии сохранены` : "Ваша фотография сохранена",
     );
   } catch (error) {
-    await userErrorHanlder(ctx, error);
+    await errorHanlder(ctx, error);
   } finally {
     delete userPhotosBuffer[String(userId)];
   }
