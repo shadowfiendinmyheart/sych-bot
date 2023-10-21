@@ -1,6 +1,6 @@
 import { Scenes } from "telegraf";
 import { makePostToTg } from "../../services/api/tgApi";
-import { updateSuggestionInfo } from "../../services/suggestion";
+import { updateSuggestion } from "../../services/suggestion";
 
 import { SceneAlias } from "../../types/scenes";
 import { chatLogger } from "../../utils/message";
@@ -35,10 +35,10 @@ refuseScene.enter(async (ctx) => {
 
     const suggestion = await getPreparedForRefuseSuggestion();
     await ctx.reply("Отклоняемый пост:", { parse_mode: "HTML" });
-    await makePostToTg(
-      { photos: suggestion.fileIds, text: suggestion.caption },
-      String(chatId),
-    );
+    await makePostToTg({
+      post: { photos: suggestion.fileIds, text: suggestion.caption },
+      chatId: String(chatId),
+    });
     await ctx.reply("Что будем делать?", getRefuseMenuKeyboard());
   } catch (error) {
     await chatLogger(ctx, "Произошла ошибка...", error);
@@ -64,10 +64,10 @@ refuseScene.action(RefuseKeyboard.GetNextSuggestion, async (ctx) => {
   try {
     const suggestion = await getPreparedForRefuseSuggestion();
     await ctx.reply("Отклоняемый пост:");
-    await makePostToTg(
-      { photos: suggestion.fileIds, text: suggestion.caption },
-      String(suggestion.userId),
-    );
+    await makePostToTg({
+      post: { photos: suggestion.fileIds, text: suggestion.caption },
+      chatId: String(suggestion.userId),
+    });
   } catch (error) {
     await chatLogger(ctx, "Произошла ошибка...", error);
   }
@@ -76,7 +76,11 @@ refuseScene.action(RefuseKeyboard.GetNextSuggestion, async (ctx) => {
 refuseScene.action(RefuseKeyboard.ReturnSuggestion, async (ctx) => {
   try {
     const suggestion = await getPreparedForRefuseSuggestion();
-    await updateSuggestionInfo({ status: "new", userId: suggestion.userId });
+    await updateSuggestion({
+      id: suggestion.id,
+      status: "sent",
+      userId: suggestion.userId,
+    });
     await ctx.reply("Отмена отмены поста!😯");
     await ctx.reply(nextSuggestionText, getNextSuggestionKeyboard());
   } catch (error) {

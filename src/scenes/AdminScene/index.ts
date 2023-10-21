@@ -2,10 +2,7 @@ import { Scenes } from "telegraf";
 
 import { SceneAlias } from "../../types/scenes";
 import { makeMessageToTg, makePostToTg } from "../../services/api/tgApi";
-import {
-  getSuggestionsByStatus,
-  updateSuggestionInfo,
-} from "../../services/suggestion";
+import { getSuggestionsByStatus, updateSuggestion } from "../../services/suggestion";
 import {
   getAdminKeyboard,
   getNextSuggestionKeyboard,
@@ -34,18 +31,18 @@ adminScene.enter(async (ctx) => {
 
 adminScene.action(MenuKeyboardAction.GetSuggestions, async (ctx) => {
   const chatId = ctx.chat?.id || 0;
-  const newSuggestions = await getSuggestionsByStatus("new");
-  if (newSuggestions.length === 0) {
+  const sentSuggestions = await getSuggestionsByStatus("sent");
+  if (sentSuggestions.length === 0) {
     await ctx.reply("В предложке пусто...");
     return;
   }
 
-  const currentSuggestion = newSuggestions[0];
+  const currentSuggestion = sentSuggestions[0];
 
-  await makePostToTg(
-    { photos: currentSuggestion.fileIds, text: currentSuggestion.caption },
-    String(chatId),
-  );
+  await makePostToTg({
+    post: { photos: currentSuggestion.fileIds, text: currentSuggestion.caption },
+    chatId: String(chatId),
+  });
 
   await ctx.reply("Норм?", getResolveSuggestionKeyboard());
 });
@@ -63,25 +60,32 @@ adminScene.action(MenuKeyboardAction.Back, async (ctx) => {
 
 adminScene.action(SuggestionKeyboardAction.Approve, async (ctx) => {
   try {
-    const newSuggestions = await getSuggestionsByStatus("new");
-    const approvedSuggestion = newSuggestions[0];
-    updateSuggestionInfo({ status: "approved", userId: approvedSuggestion.userId });
+    const sentSuggestions = await getSuggestionsByStatus("sent");
+    const approvedSuggestion = sentSuggestions[0];
+    updateSuggestion({
+      id: approvedSuggestion.id,
+      status: "approved",
+      userId: approvedSuggestion.userId,
+    });
 
     // post into public channel
-    await makePostToTg(
-      { photos: approvedSuggestion.fileIds, text: approvedSuggestion.caption },
-      String(config.TG_GROUP_ID),
-    );
+    await makePostToTg({
+      post: { photos: approvedSuggestion.fileIds, text: approvedSuggestion.caption },
+    });
 
     // send message to author with notification about post
     const userChatId = String(approvedSuggestion.userId);
     await makeMessageToTg({ chatId: userChatId, text: "Ваш пост опубликован!🎉" });
-    await makePostToTg(
-      { photos: approvedSuggestion.fileIds, text: approvedSuggestion.caption },
-      userChatId,
-    );
+    await makePostToTg({
+      post: { photos: approvedSuggestion.fileIds, text: approvedSuggestion.caption },
+      chatId: userChatId,
+    });
 
-    updateSuggestionInfo({ status: "posted", userId: approvedSuggestion.userId });
+    updateSuggestion({
+      id: approvedSuggestion.id,
+      status: "posted",
+      userId: approvedSuggestion.userId,
+    });
     await ctx.reply("Пост одобрен и успешно выложен!");
     await ctx.reply("Показать следующий пост?", getNextSuggestionKeyboard());
   } catch (error) {
@@ -91,9 +95,10 @@ adminScene.action(SuggestionKeyboardAction.Approve, async (ctx) => {
 
 adminScene.action(SuggestionKeyboardAction.Refuse, async (ctx) => {
   try {
-    const newSuggestions = await getSuggestionsByStatus("new");
-    const refusedSuggestion = newSuggestions[0];
-    await updateSuggestionInfo({
+    const sentSuggestions = await getSuggestionsByStatus("sent");
+    const refusedSuggestion = sentSuggestions[0];
+    await updateSuggestion({
+      id: refusedSuggestion.id,
       status: "preparedForRefuse",
       userId: refusedSuggestion.userId,
     });

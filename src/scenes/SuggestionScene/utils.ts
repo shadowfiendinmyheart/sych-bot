@@ -14,35 +14,43 @@ export enum KeyboardAction {
 }
 
 export const getSuggestionKeyboard = (suggestion: Suggestion) => {
-  const buttons = [
-    [Markup.button.callback("Добавить/удалить фотографии", KeyboardAction.Photo)],
-    [
+  const buttons = [];
+  const isSuggestionHasPhotos = suggestion.fileIds.length > 0;
+
+  if (suggestion.status === "draft") {
+    buttons.push([
+      Markup.button.callback("Добавить/удалить фотографии", KeyboardAction.Photo),
+    ]);
+    buttons.push([
       Markup.button.callback(
         "Добавить/удалить описание",
         KeyboardAction.Description,
       ),
-    ],
-  ];
+    ]);
+    if (isSuggestionHasPhotos) {
+      buttons.push([
+        Markup.button.callback("Отправить предложку", KeyboardAction.Send),
+      ]);
+    }
+    if (isSuggestionHasPhotos || suggestion.caption) {
+      buttons.push([
+        Markup.button.callback("Удалить предложку", KeyboardAction.Delete),
+      ]);
+    }
+  }
 
-  if (suggestion.fileIds.length > 0)
+  if (isSuggestionHasPhotos || suggestion.caption) {
     buttons.push([
       Markup.button.callback("Посмотреть предложку", KeyboardAction.Show),
     ]);
-  if (suggestion.status === "draft" && suggestion.fileIds.length > 0)
-    buttons.push([
-      Markup.button.callback("Отправить предложку", KeyboardAction.Send),
-    ]);
-  if (suggestion.status === "new")
+  }
+  if (suggestion.status === "sent") {
     buttons.push([
       Markup.button.callback("Возвартить предложку", KeyboardAction.ToDraft),
     ]);
-  if (suggestion.fileIds.length > 0 || suggestion.caption)
-    buttons.push([
-      Markup.button.callback("Удалить предложку", KeyboardAction.Delete),
-    ]);
+  }
 
   buttons.push([Markup.button.callback("Назад", KeyboardAction.Back)]);
-
   return Markup.inlineKeyboard(buttons);
 };
 

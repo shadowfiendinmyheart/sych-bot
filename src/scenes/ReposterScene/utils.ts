@@ -57,8 +57,10 @@ export const makeRepost = async () => {
     const photosUrl = getPhotosFromVkPost(vkPost);
 
     await makePostToTg({
-      text: vkPost.text,
-      photos: photosUrl,
+      post: {
+        text: vkPost.text,
+        photos: photosUrl,
+      },
     });
   } catch (error) {
     console.log("makeRepost error:", error);

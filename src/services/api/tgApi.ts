@@ -8,11 +8,16 @@ interface TgPost {
   photos?: string[];
 }
 
-interface SendMessageParams {
-  chatId: string;
+interface MakeMessageParams {
   text: string;
   parseMode?: string;
   replyMarkup?: Markup.Markup<InlineKeyboardMarkup>;
+  chatId?: string;
+}
+
+interface MakePostParams {
+  post: TgPost;
+  chatId?: string;
 }
 
 export const tgRequest = async (method: string, body: object) => {
@@ -31,7 +36,8 @@ export const tgRequest = async (method: string, body: object) => {
   }
 };
 
-export const makePostToTg = async (post: TgPost, chatId?: string) => {
+export const makePostToTg = async (params: MakePostParams) => {
+  const { post, chatId } = params;
   const photos = post.photos?.map((photo, index) => {
     const media = {
       type: "photo",
@@ -48,11 +54,11 @@ export const makePostToTg = async (post: TgPost, chatId?: string) => {
   return tgResponse;
 };
 
-export const makeMessageToTg = async (params: SendMessageParams) => {
+export const makeMessageToTg = async (params: MakeMessageParams) => {
   const tgResponse = await tgRequest("sendMessage", {
     ...params,
     parse_mode: params.parseMode || "HTML",
-    chat_id: params.chatId,
+    chat_id: params.chatId || config.TG_GROUP_ID,
     reply_markup: params.replyMarkup?.reply_markup,
   });
   return tgResponse;

@@ -3,7 +3,17 @@ import { ERRORS } from "../const";
 
 export const errorHandler = async (ctx: Context, error: any) => {
   switch (error.message) {
+    case ERRORS.WRONG_STATUS_SUGGESTION: {
+      await ctx.reply("Неверный статус предложки");
+      break;
+    }
+
     case ERRORS.EMPTY_SUGGESTION: {
+      await ctx.reply("У вас нет предложки");
+      break;
+    }
+
+    case ERRORS.EMPTY_USER_SUGGESTIONS: {
       await ctx.reply("У вас нет предложки");
       break;
     }

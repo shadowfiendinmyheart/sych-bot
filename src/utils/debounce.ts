@@ -1,4 +1,4 @@
-const debounce = <F extends (...args: any) => any>(func: F, time = 300) => {
+export default <F extends (...args: any) => any>(func: F, time = 300) => {
   let timeout: NodeJS.Timeout;
 
   const debounced = (...args: any) => {
@@ -8,5 +8,3 @@ const debounce = <F extends (...args: any) => any>(func: F, time = 300) => {
 
   return debounced as (...args: Parameters<F>) => ReturnType<F>;
 };
-
-export default debounce;

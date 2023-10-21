@@ -12,6 +12,8 @@ export const PATHS = [SUGGESTION_PATH, POSTS_PATH];
 export const ENCODING_FORMAT = "utf-8";
 
 export const ERRORS = {
-  EMPTY_SUGGESTION: "empty suggestion",
-  ADMIN_EMPTY_SUGGESTION: "adming empty suggestion",
+  WRONG_STATUS_SUGGESTION: "wrong status suggestion error",
+  EMPTY_SUGGESTION: "empty suggestion error",
+  EMPTY_USER_SUGGESTIONS: "empty user suggestions error",
+  ADMIN_EMPTY_SUGGESTION: "adming empty suggestion error",
 };

@@ -1,17 +1,22 @@
 import { Scenes } from "telegraf";
-import { getSuggestionKeyboard, KeyboardAction } from "./utils";
-import { SceneAlias } from "../../types/scenes";
-import { makePostToTg } from "../../services/api/tgApi";
+import { makePostToTg, makeMessageToTg } from "../../services/api/tgApi";
 import {
-  checkSuggestionInfo,
-  deleteSuggestionInfo,
-  getSuggestionInfo,
-  saveSuggestionInfo,
-  updateSuggestionInfo,
+  deleteSuggestion,
+  getSuggestionsByUserId,
+  getUserActiveSuggestion,
+  getUserDraftSuggestion,
+  saveSuggestion,
+  updateSuggestion,
 } from "../../services/suggestion";
 import { errorHandler } from "../utils";
 import { Suggestion } from "../../types/suggestion";
-import { getSuggestionStatusText } from "../../utils/suggestion";
+import {
+  generateSuggestionWithInitialFields,
+  getSuggestionStatusText,
+} from "../../utils/suggestion";
+import { getSuggestionKeyboard, KeyboardAction } from "./utils";
+import { SceneAlias } from "../../types/scenes";
+import { ERRORS } from "../../const";
 
 const suggestionScene = new Scenes.BaseScene<Scenes.SceneContext>(
   SceneAlias.Suggestion,
@@ -23,25 +28,20 @@ suggestionScene.enter(async (ctx) => {
   try {
     const userId = ctx.chat?.id || 0;
     const username = ctx.callbackQuery?.from.username || "";
-    const isSuggestionExist = await checkSuggestionInfo(userId);
-    if (!isSuggestionExist) {
-      const initSuggestion: Suggestion = {
-        fileIds: [],
-        status: "draft",
-        caption: "",
-        createdAt: 0,
+    const activeSuggestion = await getUserActiveSuggestion(userId);
+    if (!activeSuggestion) {
+      const initSuggestion: Suggestion = generateSuggestionWithInitialFields({
         userId,
         username,
-      };
-      await saveSuggestionInfo(initSuggestion);
+      });
+      await saveSuggestion(initSuggestion);
       await ctx.reply(welcomeSceneText, getSuggestionKeyboard(initSuggestion));
       return;
     }
 
-    const suggestion = await getSuggestionInfo(userId);
-    await ctx.reply(welcomeSceneText, getSuggestionKeyboard(suggestion));
+    await ctx.reply(welcomeSceneText, getSuggestionKeyboard(activeSuggestion));
   } catch (error) {
-    errorHandler(ctx, error);
+    await errorHandler(ctx, error);
     ctx.scene.enter(SceneAlias.Menu);
   }
 });
@@ -52,26 +52,38 @@ suggestionScene.action(KeyboardAction.Back, async (ctx) => {
 });
 
 // Показать предложку
-// TODO не показывать опубликованные предложки
 suggestionScene.action(KeyboardAction.Show, async (ctx) => {
   const chatId = ctx.chat?.id || 0;
   const userId = ctx.update.callback_query.from.id;
 
   try {
-    const suggestionInfo = await getSuggestionInfo(userId);
-    if (suggestionInfo.fileIds.length === 0 && suggestionInfo.caption.length === 0) {
+    const activeSuggestion = await getUserActiveSuggestion(userId);
+
+    if (!activeSuggestion) throw Error(ERRORS.EMPTY_SUGGESTION);
+
+    if (
+      activeSuggestion.fileIds.length === 0 &&
+      activeSuggestion.caption.length === 0
+    ) {
       await ctx.reply("Тут пусто... Сначала нужно добавить фотографии или описание");
       return;
     }
 
     await ctx.reply(
-      `Статус вашей предложки — ${getSuggestionStatusText(suggestionInfo.status)}`,
+      `Статус вашей предложки — ${getSuggestionStatusText(activeSuggestion.status)}`,
     );
-    await makePostToTg(
-      { photos: suggestionInfo.fileIds, text: suggestionInfo.caption },
-      String(chatId),
-    );
-    await ctx.reply(welcomeSceneText, getSuggestionKeyboard(suggestionInfo));
+    if (activeSuggestion.fileIds.length > 0) {
+      await makePostToTg({
+        post: { photos: activeSuggestion.fileIds, text: activeSuggestion.caption },
+        chatId: String(chatId),
+      });
+    } else {
+      await makeMessageToTg({
+        text: activeSuggestion.caption,
+        chatId: String(chatId),
+      });
+    }
+    await ctx.reply(welcomeSceneText, getSuggestionKeyboard(activeSuggestion));
   } catch (error) {
     errorHandler(ctx, error);
   }
@@ -91,19 +103,25 @@ suggestionScene.action(KeyboardAction.Description, async (ctx) => {
 suggestionScene.action(KeyboardAction.Send, async (ctx) => {
   try {
     const userId = ctx.from?.id || 0;
-    const suggestion = await getSuggestionInfo(userId);
+    const draftSuggestions = await getUserDraftSuggestion(userId);
 
-    if (suggestion.fileIds.length === 0) {
+    if (!draftSuggestions) throw Error(ERRORS.EMPTY_SUGGESTION);
+
+    if (draftSuggestions.fileIds.length === 0) {
       await ctx.reply("Сначала нужно добавить фотографии");
       return;
     }
 
-    if (suggestion.status === "new") {
+    if (draftSuggestions.status === "sent") {
       await ctx.reply("Предложка находится в обработке...");
       return;
     }
 
-    await updateSuggestionInfo({ userId: userId, status: "new" });
+    await updateSuggestion({
+      id: draftSuggestions.id,
+      userId: userId,
+      status: "sent",
+    });
     await ctx.reply("Предложка отправлена");
   } catch (error) {
     errorHandler(ctx, error);
@@ -114,14 +132,20 @@ suggestionScene.action(KeyboardAction.Send, async (ctx) => {
 suggestionScene.action(KeyboardAction.ToDraft, async (ctx) => {
   try {
     const userId = ctx.from?.id || 0;
-    const suggestion = await getSuggestionInfo(userId);
+    const activeSuggestion = await getUserActiveSuggestion(userId);
 
-    if (suggestion.status !== "new") {
+    if (!activeSuggestion) throw Error(ERRORS.EMPTY_SUGGESTION);
+
+    if (activeSuggestion.status !== "sent") {
       await ctx.reply("Неверный статус предложки");
       return;
     }
 
-    await updateSuggestionInfo({ userId: userId, status: "draft" });
+    await updateSuggestion({
+      id: activeSuggestion.id,
+      userId: userId,
+      status: "draft",
+    });
     await ctx.reply("Предложка возвращена");
   } catch (error) {
     errorHandler(ctx, error);
@@ -132,7 +156,9 @@ suggestionScene.action(KeyboardAction.ToDraft, async (ctx) => {
 suggestionScene.action(KeyboardAction.Delete, async (ctx) => {
   try {
     const userId = ctx.from?.id || 0;
-    await deleteSuggestionInfo(userId);
+    const activeSuggestion = await getUserActiveSuggestion(userId);
+    if (!activeSuggestion) throw Error(ERRORS.EMPTY_SUGGESTION);
+    await deleteSuggestion(activeSuggestion.id);
     await ctx.reply("Предложка удалена");
   } catch (error) {
     errorHandler(ctx, error);

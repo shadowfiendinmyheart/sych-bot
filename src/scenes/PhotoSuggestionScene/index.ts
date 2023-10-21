@@ -1,9 +1,10 @@
 import { Scenes } from "telegraf";
-import { updateSuggestionInfo } from "../../services/suggestion";
+import { getUserDraftSuggestion, updateSuggestion } from "../../services/suggestion";
 import debounce from "../../utils/debounce";
 
 import { SceneAlias } from "../../types/scenes";
 import { uploadPhoto, userPhotosBuffer } from "./utils";
+import { ERRORS } from "../../const";
 
 enum PhotoKeyboard {
   Done = "Готово",
@@ -19,13 +20,17 @@ const photoSuggestionScene = new Scenes.BaseScene<Scenes.SceneContext>(
 
 photoSuggestionScene.enter(async (ctx) => {
   const chatId = ctx.chat?.id || 0;
-  ctx.telegram.sendMessage(chatId, `Отправьте не более ${MAX_PHOTO_NUMBER} фото`, {
-    reply_markup: {
-      keyboard: [[{ text: PhotoKeyboard.Delete }, { text: PhotoKeyboard.Back }]],
-      one_time_keyboard: true,
-      remove_keyboard: true,
+  ctx.telegram.sendMessage(
+    chatId,
+    `Максимальное количество фотографий для предложки — ${MAX_PHOTO_NUMBER}`,
+    {
+      reply_markup: {
+        keyboard: [[{ text: PhotoKeyboard.Delete }, { text: PhotoKeyboard.Back }]],
+        one_time_keyboard: true,
+        remove_keyboard: true,
+      },
     },
-  });
+  );
 });
 
 const debouncedUploadPhoto = debounce(uploadPhoto, 2000);
@@ -44,10 +49,18 @@ photoSuggestionScene.on("photo", async (ctx) => {
 
 photoSuggestionScene.on("text", async (ctx) => {
   const userId = ctx.message.from.id;
+  const draftSuggestion = await getUserDraftSuggestion(userId);
+
+  if (!draftSuggestion) throw Error(ERRORS.EMPTY_SUGGESTION);
+
   const text = ctx.message.text;
 
   if (text === PhotoKeyboard.Delete) {
-    await updateSuggestionInfo({ userId, fileIds: [] });
+    if (draftSuggestion.fileIds.length === 0) {
+      await ctx.reply("К вашей предложке не прикреплено ни одной фотографии");
+      return;
+    }
+    await updateSuggestion({ id: draftSuggestion.id, fileIds: [] });
     await ctx.reply("Фотографии удалены");
 
     await ctx.scene.enter(SceneAlias.Suggestion);

@@ -17,7 +17,7 @@ import { SceneAlias } from "./types/scenes";
 import { PATHS } from "./const";
 
 if (!config.BOT_TOKEN) {
-  throw new Error("BOT_TOKEN must be provided!");
+  throw Error("BOT_TOKEN must be provided!");
 }
 
 const bot = new Telegraf<Scenes.SceneContext>(config.BOT_TOKEN as string);

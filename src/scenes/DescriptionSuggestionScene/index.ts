@@ -1,9 +1,13 @@
 import { Scenes } from "telegraf";
 
 import { SceneAlias } from "../../types/scenes";
-import { MAX_TG_MESSAGE_LENGTH } from "../../const";
+import { ERRORS, MAX_TG_MESSAGE_LENGTH } from "../../const";
 import { errorHandler } from "../utils";
-import { updateSuggestionInfo } from "../../services/suggestion";
+import {
+  getSuggestionsByUserId,
+  getUserDraftSuggestion,
+  updateSuggestion,
+} from "../../services/suggestion";
 
 enum DescriptionKeyboard {
   Done = "Готово",
@@ -37,8 +41,13 @@ descriptionSuggestionScene.on("text", async (ctx) => {
   const text = ctx.message.text;
 
   try {
+    const draftSuggestion = await getUserDraftSuggestion(userId);
+    if (!draftSuggestion) throw Error(ERRORS.EMPTY_SUGGESTION);
     if (text === DescriptionKeyboard.Delete) {
-      await updateSuggestionInfo({ userId, caption: "" });
+      if (!draftSuggestion.caption) {
+        await ctx.reply("У вашей предложки пока нет описания...");
+      }
+      await updateSuggestion({ id: draftSuggestion.id, caption: "" });
       await ctx.reply("Описание удалено");
       await ctx.scene.enter(SceneAlias.Suggestion);
       return;
@@ -49,7 +58,7 @@ descriptionSuggestionScene.on("text", async (ctx) => {
       return;
     }
 
-    await updateSuggestionInfo({ userId, caption: text });
+    await updateSuggestion({ id: draftSuggestion.id, caption: text });
     await ctx.reply(
       "Описание успешно сохранено.\nЕсли хотите его изменить, просто отправьте сообщение ещё раз\nНажмите 'Назад', чтобы вернуться",
     );

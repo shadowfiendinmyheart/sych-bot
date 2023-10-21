@@ -80,8 +80,7 @@ reposterScene.action(KeyboardAction.MakePost, async (ctx) => {
     const messageWithLink = `${postText}\n\n<a href="${config.VK_POST_LINK}${curPost.id}">Источник с комментариями</a>`;
     const photos = getPhotosFromVkPost(curPost);
     const tgPostResponse = await makePostToTg({
-      text: postText,
-      photos: photos,
+      post: { text: postText, photos: photos },
     });
     await ctx.telegram.editMessageCaption(
       String(config.TG_GROUP_ID),
