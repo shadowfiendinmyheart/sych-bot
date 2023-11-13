@@ -16,6 +16,8 @@ import {
   SORTED_POSTS_FILE_NAME,
 } from "../../const";
 import awaiter from "../../utils/awaiter";
+import config from "../../config";
+import { editMessageCaption, getMessageWithSourceLink } from "../../utils/message";
 
 interface PostData {
   id: number;
@@ -33,35 +35,41 @@ export const getReposterKeyboard = () => {
   ]);
 };
 
-export const CHECK_PERIOD = 1800000;
+export const CHECK_PERIOD = 1_800_000; // 30 minutes
 
-export const makeRepost = async () => {
+export const makeRepost = async (ctx: any) => {
   try {
     const vkPost = await getVkLastPost();
-    const isPosted = checkIsPosted(Number(vkPost.date));
-    const isValidToPost = checkIsValid(vkPost);
 
+    const isPosted = checkIsPosted(Number(vkPost.date));
+    if (isPosted) {
+      console.log(
+        Date.now(),
+        `\nid: ${vkPost.id}\ntime: ${Number(vkPost.date) * 1000}\nalready posted\n`,
+      );
+      return;
+    }
+
+    const isValidToPost = checkIsValid(vkPost);
+    console.log("isValidToPost", isValidToPost);
     if (!isValidToPost) {
       console.log(`Post ${vkPost.id} is not valid`);
       return;
     }
 
-    if (isPosted) {
-      console.log(
-        Date.now(),
-        `\nid: ${vkPost.id}\ntime: ${Number(vkPost.date) * 1000}\n already posted\n`,
-      );
-      return;
-    }
-
     const photosUrl = getPhotosFromVkPost(vkPost);
 
-    await makePostToTg({
-      post: {
-        text: vkPost.text,
-        photos: photosUrl,
-      },
+    const messageWithSourceLink = getMessageWithSourceLink(
+      `#fromVk \n\n${vkPost.text}`,
+      `${config.VK_POST_LINK}${vkPost.id}`,
+    );
+    const tgPostResponse = await makePostToTg({
+      post: { text: messageWithSourceLink, photos: photosUrl },
     });
+    await editMessageCaption(
+      tgPostResponse.result[0].message_id,
+      messageWithSourceLink,
+    );
   } catch (error) {
     console.log("makeRepost error:", error);
   }

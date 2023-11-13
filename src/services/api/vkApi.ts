@@ -15,6 +15,7 @@ export interface VkPost {
     count: number;
   };
   attachments: VkAttachment[];
+  copyright?: object;
 }
 
 interface VkAttachment {
@@ -60,8 +61,7 @@ export const checkIsPosted = (postTimestamp: number) => {
 };
 
 export const checkIsValid = (post: VkPost) => {
-  if (post.marked_as_ads || post.post_type !== "post") return false;
-  return true;
+  return post.marked_as_ads === 0 && !post.copyright && post.post_type === "post";
 };
 
 export const getVkLastPost = async (): Promise<VkPost> => {
@@ -69,7 +69,7 @@ export const getVkLastPost = async (): Promise<VkPost> => {
     count: 2,
     owner_id: config.VK_GROUP_ID,
   });
-  const lastPost = vkResponse.items[0];
+  const lastPost = vkResponse.items[1];
   return lastPost;
 };
 

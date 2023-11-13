@@ -2,6 +2,7 @@ import { Context, Telegram } from "telegraf";
 import { ExtraEditMessageText } from "telegraf/typings/telegram-types";
 import { Message } from "typegram";
 import config from "../config";
+import { MAX_TG_MESSAGE_LENGTH } from "../const";
 import awaiter from "./awaiter";
 
 const telegram: Telegram = new Telegram(config.BOT_TOKEN as string);
@@ -43,13 +44,23 @@ export const editChatMessage = async (
   }
 };
 
-export const editMessage = async (ctx: Context, newText: string) => {
-  try {
-    await deleteUserMessage(ctx);
-    await ctx.replyWithHTML(newText);
-  } catch (e) {
-    console.log(e);
-  }
+export const getMessageWithSourceLink = (message: string, link: string) => {
+  const postText =
+    message.length > MAX_TG_MESSAGE_LENGTH
+      ? message.slice(0, MAX_TG_MESSAGE_LENGTH) + "..."
+      : message;
+  const messageWithLink = `${postText}\n\n<a href="${link}">Источник с комментариями</a>`;
+  return messageWithLink;
+};
+
+export const editMessageCaption = async (messageId: number, newCaption: string) => {
+  await telegram.editMessageCaption(
+    String(config.TG_GROUP_ID),
+    messageId,
+    undefined,
+    newCaption,
+    { parse_mode: "HTML" },
+  );
 };
 
 export const chatLogger = async (
