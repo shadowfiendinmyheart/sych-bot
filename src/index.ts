@@ -1,5 +1,4 @@
 import config from "./config";
-import * as fs from "fs";
 import { Telegraf, session, Scenes } from "telegraf";
 import { stopLoadingInlineButton } from "./middlewares/inlineKeyboardMiddleware";
 
@@ -14,7 +13,7 @@ import adminScene from "./scenes/AdminScene";
 import refuseScene from "./scenes/RefuseScene";
 
 import { SceneAlias } from "./types/scenes";
-import { PATHS } from "./const";
+import { initFiles } from "./utils/init";
 
 if (!config.BOT_TOKEN) {
   throw Error("BOT_TOKEN must be provided!");
@@ -46,17 +45,9 @@ bot.on("message", async (ctx) => {
 });
 
 bot.launch();
+initFiles();
 
 console.log("working . . .");
-
-// init folders
-PATHS.forEach((path) => {
-  if (!fs.existsSync(path)) {
-    fs.mkdirSync(path, { recursive: true });
-  }
-});
-
-// TODO: init files
 
 // Enable graceful stop
 process.once("SIGINT", () => bot.stop("SIGINT"));

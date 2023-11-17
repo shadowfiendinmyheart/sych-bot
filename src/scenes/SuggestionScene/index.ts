@@ -2,7 +2,6 @@ import { Scenes } from "telegraf";
 import { makePostToTg, makeMessageToTg } from "../../services/api/tgApi";
 import {
   deleteSuggestion,
-  getSuggestionsByUserId,
   getUserActiveSuggestion,
   getUserDraftSuggestion,
   saveSuggestion,

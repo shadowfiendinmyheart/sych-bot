@@ -6,14 +6,15 @@ import {
   SuggestionsFile,
   SuggestionStatus,
 } from "../../types/suggestion";
-import { ENCODING_FORMAT, ERRORS, SUGGESTION_PATH } from "../../const";
+import { ENCODING_FORMAT, SUGGESTION_PATH } from "../../const";
 
 type UserId = Suggestion["userId"];
 type SuggestionId = Suggestion["id"];
 
 const ACTIVE_SUGGESTION_STATUSES: SuggestionStatus[] = ["draft", "sent", "approved"];
 
-const suggestionFilePath = `${SUGGESTION_PATH}/suggestions.json`;
+export const suggestionFileName = "suggestions.json";
+export const suggestionFilePath = `${SUGGESTION_PATH}/${suggestionFileName}`;
 
 export const getSuggestionFile = async () => {
   const suggestionsRaw = fs.readFileSync(suggestionFilePath, ENCODING_FORMAT);
