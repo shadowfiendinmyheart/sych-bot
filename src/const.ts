@@ -16,4 +16,5 @@ export const ERRORS = {
   EMPTY_SUGGESTION: "empty suggestion error",
   EMPTY_USER_SUGGESTIONS: "empty user suggestions error",
   ADMIN_EMPTY_SUGGESTION: "adming empty suggestion error",
+  SAVE_SUGGESTION: "save suggestion error",
 };

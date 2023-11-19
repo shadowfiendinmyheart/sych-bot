@@ -32,6 +32,11 @@ export const errorHandler = async (ctx: Context, error: any) => {
       break;
     }
 
+    case ERRORS.SAVE_SUGGESTION: {
+      await ctx.reply("Во время сохранения предложки произошла ошибка");
+      break;
+    }
+
     default: {
       await ctx.reply("Произошла ошибка на сервере... Попробуйте позже");
     }

@@ -88,14 +88,30 @@ suggestionScene.action(KeyboardAction.Show, async (ctx) => {
   }
 });
 
-// Фотографии
+// Добавить фотографии
 suggestionScene.action(KeyboardAction.Photo, async (ctx) => {
-  await ctx.scene.enter(SceneAlias.PhotoSuggestion);
+  try {
+    const userId = ctx.from?.id || 0;
+    const draftSuggestions = await getUserDraftSuggestion(userId);
+    if (!draftSuggestions) throw Error(ERRORS.WRONG_STATUS_SUGGESTION);
+
+    await ctx.scene.enter(SceneAlias.PhotoSuggestion);
+  } catch (error) {
+    errorHandler(ctx, error);
+  }
 });
 
-// Описание
+// Добавить описание
 suggestionScene.action(KeyboardAction.Description, async (ctx) => {
-  await ctx.scene.enter(SceneAlias.DescriptionSuggestion);
+  try {
+    const userId = ctx.from?.id || 0;
+    const draftSuggestions = await getUserDraftSuggestion(userId);
+    if (!draftSuggestions) throw Error(ERRORS.WRONG_STATUS_SUGGESTION);
+
+    await ctx.scene.enter(SceneAlias.DescriptionSuggestion);
+  } catch (error) {
+    errorHandler(ctx, error);
+  }
 });
 
 // Отправить
@@ -104,7 +120,7 @@ suggestionScene.action(KeyboardAction.Send, async (ctx) => {
     const userId = ctx.from?.id || 0;
     const draftSuggestions = await getUserDraftSuggestion(userId);
 
-    if (!draftSuggestions) throw Error(ERRORS.EMPTY_SUGGESTION);
+    if (!draftSuggestions) throw Error(ERRORS.WRONG_STATUS_SUGGESTION);
 
     if (draftSuggestions.fileIds.length === 0) {
       await ctx.reply("Сначала нужно добавить фотографии");
@@ -116,12 +132,16 @@ suggestionScene.action(KeyboardAction.Send, async (ctx) => {
       return;
     }
 
-    await updateSuggestion({
+    const updatedSuggestion = await updateSuggestion({
       id: draftSuggestions.id,
       userId: userId,
       status: "sent",
     });
-    await ctx.reply("Предложка отправлена");
+    if (!updatedSuggestion) throw Error(ERRORS.SAVE_SUGGESTION);
+    await ctx.editMessageText(
+      "Предложка отправлена",
+      getSuggestionKeyboard(updatedSuggestion),
+    );
   } catch (error) {
     errorHandler(ctx, error);
   }
@@ -140,12 +160,16 @@ suggestionScene.action(KeyboardAction.ToDraft, async (ctx) => {
       return;
     }
 
-    await updateSuggestion({
+    const updatedSuggestion = await updateSuggestion({
       id: activeSuggestion.id,
       userId: userId,
       status: "draft",
     });
-    await ctx.reply("Предложка возвращена");
+    if (!updatedSuggestion) throw Error(ERRORS.WRONG_STATUS_SUGGESTION);
+    await ctx.editMessageText(
+      "Предложка возвращена",
+      getSuggestionKeyboard(updatedSuggestion),
+    );
   } catch (error) {
     errorHandler(ctx, error);
   }
@@ -155,10 +179,20 @@ suggestionScene.action(KeyboardAction.ToDraft, async (ctx) => {
 suggestionScene.action(KeyboardAction.Delete, async (ctx) => {
   try {
     const userId = ctx.from?.id || 0;
-    const activeSuggestion = await getUserActiveSuggestion(userId);
-    if (!activeSuggestion) throw Error(ERRORS.EMPTY_SUGGESTION);
-    await deleteSuggestion(activeSuggestion.id);
-    await ctx.reply("Предложка удалена");
+    const username = ctx.callbackQuery?.from.username || "";
+    const draftSuggestion = await getUserDraftSuggestion(userId);
+    if (!draftSuggestion) throw Error(ERRORS.WRONG_STATUS_SUGGESTION);
+    await deleteSuggestion(draftSuggestion.id);
+
+    const initSuggestion: Suggestion = generateSuggestionWithInitialFields({
+      userId,
+      username,
+    });
+    await saveSuggestion(initSuggestion);
+    await ctx.editMessageText(
+      welcomeSceneText,
+      getSuggestionKeyboard(initSuggestion),
+    );
   } catch (error) {
     errorHandler(ctx, error);
   }

@@ -5,6 +5,7 @@ import debounce from "../../utils/debounce";
 import { SceneAlias } from "../../types/scenes";
 import { uploadPhoto, userPhotosBuffer } from "./utils";
 import { ERRORS } from "../../const";
+import { errorHandler } from "../utils";
 
 enum PhotoKeyboard {
   Done = "Готово",
@@ -48,28 +49,33 @@ photoSuggestionScene.on("photo", async (ctx) => {
 });
 
 photoSuggestionScene.on("text", async (ctx) => {
-  const userId = ctx.message.from.id;
-  const draftSuggestion = await getUserDraftSuggestion(userId);
+  try {
+    const userId = ctx.message.from.id;
+    const draftSuggestion = await getUserDraftSuggestion(userId);
 
-  if (!draftSuggestion) throw Error(ERRORS.EMPTY_SUGGESTION);
+    if (!draftSuggestion) throw Error(ERRORS.EMPTY_SUGGESTION);
 
-  const text = ctx.message.text;
+    const text = ctx.message.text;
 
-  if (text === PhotoKeyboard.Delete) {
-    if (draftSuggestion.fileIds.length === 0) {
-      await ctx.reply("К вашей предложке не прикреплено ни одной фотографии");
+    if (text === PhotoKeyboard.Delete) {
+      if (draftSuggestion.fileIds.length === 0) {
+        await ctx.reply("К вашей предложке не прикреплено ни одной фотографии");
+        return;
+      }
+      await updateSuggestion({ id: draftSuggestion.id, fileIds: [] });
+      await ctx.reply("Фотографии удалены");
+
+      await ctx.scene.enter(SceneAlias.Suggestion);
       return;
     }
-    await updateSuggestion({ id: draftSuggestion.id, fileIds: [] });
-    await ctx.reply("Фотографии удалены");
 
+    if (text === PhotoKeyboard.Back) {
+      await ctx.scene.enter(SceneAlias.Suggestion);
+      return;
+    }
+  } catch (error) {
+    await errorHandler(ctx, error);
     await ctx.scene.enter(SceneAlias.Suggestion);
-    return;
-  }
-
-  if (text === PhotoKeyboard.Back) {
-    await ctx.scene.enter(SceneAlias.Suggestion);
-    return;
   }
 });
 

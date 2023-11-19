@@ -9,11 +9,13 @@ import {
   getResolveSuggestionKeyboard,
 } from "./utils";
 import { chatLogger } from "../../utils/message";
-import config from "../../config";
+import { getPreparedForRefuseSuggestion } from "../RefuseScene/utils";
+import { errorHandler } from "../utils";
+import { ERRORS } from "../../const";
 
 export enum MenuKeyboardAction {
   GetSuggestions = "GetSuggestions",
-  GetPreparedForRefuseSuggestions = "GetSuggestions",
+  GetPreparedForRefuseSuggestions = "GetPreparedForRefuseSuggestions",
   Back = "Back",
 }
 
@@ -50,7 +52,14 @@ adminScene.action(MenuKeyboardAction.GetSuggestions, async (ctx) => {
 adminScene.action(
   MenuKeyboardAction.GetPreparedForRefuseSuggestions,
   async (ctx) => {
-    await ctx.scene.enter(SceneAlias.Refuse);
+    try {
+      const suggestion = await getPreparedForRefuseSuggestion();
+      if (!suggestion) throw Error(ERRORS.ADMIN_EMPTY_SUGGESTION);
+
+      await ctx.scene.enter(SceneAlias.Refuse);
+    } catch (error) {
+      await errorHandler(ctx, error);
+    }
   },
 );
 

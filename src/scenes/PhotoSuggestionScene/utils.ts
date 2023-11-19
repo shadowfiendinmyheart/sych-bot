@@ -27,7 +27,8 @@ export const uploadPhoto = async (ctx: any, userId: number, photoIds: string[]) 
       draftSuggestion = initSuggestion;
     }
 
-    if (draftSuggestion?.fileIds?.length > MAX_PHOTO_NUMBER) {
+    const totalPhotoLength = draftSuggestion?.fileIds?.length + photoIds.length;
+    if (totalPhotoLength > MAX_PHOTO_NUMBER) {
       await ctx.reply(`Превышен лимит в ${MAX_PHOTO_NUMBER} фото`);
       return;
     }

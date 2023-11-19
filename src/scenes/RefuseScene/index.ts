@@ -41,8 +41,8 @@ refuseScene.enter(async (ctx) => {
     });
     await ctx.reply("Что будем делать?", getRefuseMenuKeyboard());
   } catch (error) {
-    await chatLogger(ctx, "Произошла ошибка...", error);
-    errorHandler(ctx, error);
+    await errorHandler(ctx, error);
+    await ctx.scene.enter(SceneAlias.Admin);
   }
 });
 

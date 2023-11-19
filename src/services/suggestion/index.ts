@@ -88,8 +88,9 @@ export const updateSuggestion = async (
 ) => {
   const oldSuggestion = await getSuggestion(suggestion.id);
   if (!oldSuggestion) return;
-  await saveSuggestion({ ...oldSuggestion, ...suggestion });
-  return true;
+  const updatedSuggestion: Suggestion = { ...oldSuggestion, ...suggestion };
+  await saveSuggestion(updatedSuggestion);
+  return updatedSuggestion;
 };
 
 export const deleteSuggestions = async (userId: UserId) => {

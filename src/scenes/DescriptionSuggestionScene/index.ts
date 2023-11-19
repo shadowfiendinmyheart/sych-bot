@@ -3,11 +3,7 @@ import { Scenes } from "telegraf";
 import { SceneAlias } from "../../types/scenes";
 import { ERRORS, MAX_TG_MESSAGE_LENGTH } from "../../const";
 import { errorHandler } from "../utils";
-import {
-  getSuggestionsByUserId,
-  getUserDraftSuggestion,
-  updateSuggestion,
-} from "../../services/suggestion";
+import { getUserDraftSuggestion, updateSuggestion } from "../../services/suggestion";
 
 enum DescriptionKeyboard {
   Done = "Готово",
@@ -58,12 +54,18 @@ descriptionSuggestionScene.on("text", async (ctx) => {
       return;
     }
 
+    if (text.length > MAX_TG_MESSAGE_LENGTH) {
+      await ctx.reply("Слишком длинное описание, попробуй короче");
+      return;
+    }
+
     await updateSuggestion({ id: draftSuggestion.id, caption: text });
     await ctx.reply(
       "Описание успешно сохранено.\nЕсли хотите его изменить, просто отправьте сообщение ещё раз\nНажмите 'Назад', чтобы вернуться",
     );
   } catch (error) {
-    errorHandler(ctx, error);
+    await errorHandler(ctx, error);
+    await ctx.scene.enter(SceneAlias.Suggestion);
   }
 });
 
