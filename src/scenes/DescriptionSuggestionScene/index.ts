@@ -1,12 +1,15 @@
-import { Scenes } from "telegraf";
+import { Markup, Scenes } from "telegraf";
 
 import { SceneAlias } from "../../types/scenes";
 import { ERRORS, MAX_TG_MESSAGE_LENGTH } from "../../const";
 import { errorHandler } from "../utils";
 import { getUserDraftSuggestion, updateSuggestion } from "../../services/suggestion";
+import {
+  getDescriptionSuggestionKeyboard,
+  getTextWithDescriptionSuggestionHint,
+} from "./utils";
 
-enum DescriptionKeyboard {
-  Done = "Готово",
+export enum DescriptionKeyboard {
   Delete = "Удалить",
   Back = "Назад",
 }
@@ -16,20 +19,22 @@ const descriptionSuggestionScene = new Scenes.BaseScene<Scenes.SceneContext>(
 );
 
 descriptionSuggestionScene.enter(async (ctx) => {
-  const chatId = ctx.chat?.id || 0;
-  ctx.telegram.sendMessage(
-    chatId,
-    `Отправьте не более ${MAX_TG_MESSAGE_LENGTH} символов`,
-    {
-      reply_markup: {
-        keyboard: [
-          [{ text: DescriptionKeyboard.Delete }, { text: DescriptionKeyboard.Back }],
-        ],
-        one_time_keyboard: true,
-        // remove_keyboard: true
-      },
-    },
-  );
+  try {
+    const userId = ctx.chat?.id || 0;
+    const draftSuggestion = await getUserDraftSuggestion(userId);
+    if (!draftSuggestion) throw ERRORS.EMPTY_SUGGESTION;
+
+    await ctx.reply(
+      getTextWithDescriptionSuggestionHint(
+        `Отправьте не более ${MAX_TG_MESSAGE_LENGTH} символов`,
+        draftSuggestion,
+      ),
+      getDescriptionSuggestionKeyboard(draftSuggestion),
+    );
+  } catch (error) {
+    await errorHandler(ctx, error);
+    await ctx.scene.enter(SceneAlias.Suggestion);
+  }
 });
 
 descriptionSuggestionScene.on("text", async (ctx) => {
@@ -43,9 +48,16 @@ descriptionSuggestionScene.on("text", async (ctx) => {
       if (!draftSuggestion.caption) {
         await ctx.reply("У вашей предложки пока нет описания...");
       }
-      await updateSuggestion({ id: draftSuggestion.id, caption: "" });
-      await ctx.reply("Описание удалено");
-      await ctx.scene.enter(SceneAlias.Suggestion);
+      const updatedSuggestion = await updateSuggestion({
+        id: draftSuggestion.id,
+        caption: "",
+      });
+      if (!updatedSuggestion) throw ERRORS.SAVE_SUGGESTION;
+
+      await ctx.reply(
+        getTextWithDescriptionSuggestionHint("Описание удалено", updatedSuggestion),
+        getDescriptionSuggestionKeyboard(updatedSuggestion),
+      );
       return;
     }
 
@@ -59,9 +71,17 @@ descriptionSuggestionScene.on("text", async (ctx) => {
       return;
     }
 
-    await updateSuggestion({ id: draftSuggestion.id, caption: text });
+    const updatedSuggestion = await updateSuggestion({
+      id: draftSuggestion.id,
+      caption: text,
+    });
+    if (!updatedSuggestion) throw ERRORS.SAVE_SUGGESTION;
     await ctx.reply(
-      "Описание успешно сохранено.\nЕсли хотите его изменить, просто отправьте сообщение ещё раз\nНажмите 'Назад', чтобы вернуться",
+      getTextWithDescriptionSuggestionHint(
+        "Описание успешно сохранено.\nЕсли хотите его изменить, просто отправьте сообщение ещё раз",
+        updatedSuggestion,
+      ),
+      getDescriptionSuggestionKeyboard(updatedSuggestion),
     );
   } catch (error) {
     await errorHandler(ctx, error);

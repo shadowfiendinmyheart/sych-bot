@@ -1,14 +1,45 @@
-import { MAX_PHOTO_NUMBER } from ".";
+import { Markup } from "telegraf";
+import { MAX_PHOTO_NUMBER, PhotoSuggestionKeyboard } from ".";
+import { ERRORS } from "../../const";
 import {
   getUserDraftSuggestion,
   saveSuggestion,
   updateSuggestion,
 } from "../../services/suggestion";
+import { Suggestion } from "../../types/suggestion";
 import { generateSuggestionWithInitialFields } from "../../utils/suggestion";
 import { errorHandler } from "../utils";
 
-export const userPhotosBuffer: Record<string, string[]> = {};
+export const getIsAllowPhotoDelete = (suggestion: Suggestion) =>
+  suggestion.fileIds.length > 0;
 
+export const getTextWithPhotoSuggestionHint = (
+  text: string,
+  suggestion: Suggestion,
+) =>
+  `${text}\nВведите 'Назад', чтобы вернуться в предыдущее меню ${
+    getIsAllowPhotoDelete(suggestion)
+      ? `\nВведите 'Удалить', если хотите удалить ${
+          suggestion.fileIds.length === 1
+            ? "текущую фотографию"
+            : "текущие фотографии"
+        }`
+      : ""
+  }`;
+
+export const getPhotoSuggestionKeyboard = (suggestion: Suggestion) => {
+  const buttons = [];
+  if (getIsAllowPhotoDelete(suggestion)) {
+    buttons.push({ text: PhotoSuggestionKeyboard.Delete });
+  }
+  buttons.push({
+    text: PhotoSuggestionKeyboard.Back,
+  });
+
+  return Markup.keyboard([buttons]).oneTime().resize();
+};
+
+export const userPhotosBuffer: Record<string, string[]> = {};
 export const uploadPhoto = async (ctx: any, userId: number, photoIds: string[]) => {
   const caption = ctx.message.caption;
   const username =
@@ -33,13 +64,19 @@ export const uploadPhoto = async (ctx: any, userId: number, photoIds: string[]) 
       return;
     }
 
-    await updateSuggestion({
+    const updatedSuggestion = await updateSuggestion({
       id: draftSuggestion.id,
       fileIds: [...draftSuggestion.fileIds, ...photoIds],
     });
+    if (!updatedSuggestion) throw ERRORS.SAVE_SUGGESTION;
+
     const photosLength = userPhotosBuffer[String(userId)].length;
     await ctx.reply(
-      photosLength > 1 ? `Ваши фотографии сохранены` : "Ваша фотография сохранена",
+      getTextWithPhotoSuggestionHint(
+        photosLength > 1 ? `Ваши фотографии сохранены` : "Ваша фотография сохранена",
+        updatedSuggestion,
+      ),
+      getPhotoSuggestionKeyboard(updatedSuggestion),
     );
   } catch (error) {
     await errorHandler(ctx, error);

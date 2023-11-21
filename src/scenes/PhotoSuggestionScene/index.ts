@@ -3,13 +3,17 @@ import { getUserDraftSuggestion, updateSuggestion } from "../../services/suggest
 import debounce from "../../utils/debounce";
 
 import { SceneAlias } from "../../types/scenes";
-import { uploadPhoto, userPhotosBuffer } from "./utils";
+import {
+  getPhotoSuggestionKeyboard,
+  getTextWithPhotoSuggestionHint,
+  uploadPhoto,
+  userPhotosBuffer,
+} from "./utils";
 import { ERRORS } from "../../const";
 import { errorHandler } from "../utils";
 
-enum PhotoKeyboard {
-  Done = "Готово",
-  Delete = "Удалить все фото",
+export enum PhotoSuggestionKeyboard {
+  Delete = "Удалить",
   Back = "Назад",
 }
 
@@ -20,18 +24,22 @@ const photoSuggestionScene = new Scenes.BaseScene<Scenes.SceneContext>(
 );
 
 photoSuggestionScene.enter(async (ctx) => {
-  const chatId = ctx.chat?.id || 0;
-  ctx.telegram.sendMessage(
-    chatId,
-    `Максимальное количество фотографий для предложки — ${MAX_PHOTO_NUMBER}`,
-    {
-      reply_markup: {
-        keyboard: [[{ text: PhotoKeyboard.Delete }, { text: PhotoKeyboard.Back }]],
-        one_time_keyboard: true,
-        remove_keyboard: true,
-      },
-    },
-  );
+  try {
+    const userId = ctx.chat?.id || 0;
+    const draftSuggestion = await getUserDraftSuggestion(userId);
+    if (!draftSuggestion) throw ERRORS.EMPTY_SUGGESTION;
+
+    await ctx.reply(
+      getTextWithPhotoSuggestionHint(
+        `Максимальное количество фотографий для предложки — ${MAX_PHOTO_NUMBER}`,
+        draftSuggestion,
+      ),
+      getPhotoSuggestionKeyboard(draftSuggestion),
+    );
+  } catch (error) {
+    await errorHandler(ctx, error);
+    await ctx.scene.enter(SceneAlias.Suggestion);
+  }
 });
 
 const debouncedUploadPhoto = debounce(uploadPhoto, 2000);
@@ -57,22 +65,29 @@ photoSuggestionScene.on("text", async (ctx) => {
 
     const text = ctx.message.text;
 
-    if (text === PhotoKeyboard.Delete) {
+    if (text === PhotoSuggestionKeyboard.Back) {
+      await ctx.scene.enter(SceneAlias.Suggestion);
+      return;
+    }
+
+    if (text === PhotoSuggestionKeyboard.Delete) {
       if (draftSuggestion.fileIds.length === 0) {
         await ctx.reply("К вашей предложке не прикреплено ни одной фотографии");
         return;
       }
-      await updateSuggestion({ id: draftSuggestion.id, fileIds: [] });
-      await ctx.reply("Фотографии удалены");
-
-      await ctx.scene.enter(SceneAlias.Suggestion);
+      const updatedSuggestion = await updateSuggestion({
+        id: draftSuggestion.id,
+        fileIds: [],
+      });
+      if (!updatedSuggestion) throw ERRORS.SAVE_SUGGESTION;
+      await ctx.reply(
+        getTextWithPhotoSuggestionHint("Фотографии удалены", updatedSuggestion),
+        getPhotoSuggestionKeyboard(updatedSuggestion),
+      );
       return;
     }
 
-    if (text === PhotoKeyboard.Back) {
-      await ctx.scene.enter(SceneAlias.Suggestion);
-      return;
-    }
+    await ctx.reply("Неизвестная команда...");
   } catch (error) {
     await errorHandler(ctx, error);
     await ctx.scene.enter(SceneAlias.Suggestion);
