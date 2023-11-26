@@ -112,7 +112,7 @@ adminScene.action(SuggestionKeyboardAction.Refuse, async (ctx) => {
       userId: refusedSuggestion.userId,
     });
 
-    await ctx.scene.enter(SceneAlias.Refuse);
+    await ctx.reply("Показать следующий пост?", getNextSuggestionKeyboard());
   } catch (error) {
     await chatLogger(ctx, "Произошла ошибка...", error);
   }

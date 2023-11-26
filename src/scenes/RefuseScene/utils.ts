@@ -18,7 +18,7 @@ export const getRefuseMenuKeyboard = () => {
   ]);
 };
 
-export const getNextSuggestionKeyboard = () => {
+export const getNextRefusedSuggestionKeyboard = () => {
   return Markup.inlineKeyboard([
     [Markup.button.callback("▶️", RefuseKeyboard.GetNextSuggestion)],
     [Markup.button.callback("Назад", RefuseKeyboard.Back)],
@@ -36,11 +36,7 @@ export const getPreparedForRefuseSuggestion = async () => {
   const preparedForRefuseSuggestions = await getSuggestionsByStatus(
     "preparedForRefuse",
   );
-
-  if (!preparedForRefuseSuggestions[0]) {
-    throw Error(ERRORS.ADMIN_EMPTY_SUGGESTION);
-  }
-
+  if (!preparedForRefuseSuggestions[0]) throw Error(ERRORS.ADMIN_EMPTY_SUGGESTION);
   return preparedForRefuseSuggestions[0];
 };
 

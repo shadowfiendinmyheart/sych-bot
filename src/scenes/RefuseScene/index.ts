@@ -3,10 +3,9 @@ import { makePostToTg } from "../../services/api/tgApi";
 import { updateSuggestion } from "../../services/suggestion";
 
 import { SceneAlias } from "../../types/scenes";
-import { chatLogger } from "../../utils/message";
 import { errorHandler } from "../utils";
 import {
-  getNextSuggestionKeyboard,
+  getNextRefusedSuggestionKeyboard,
   getPreparedForRefuseSuggestion,
   getRefuseMenuKeyboard,
   refuseSuggestion,
@@ -54,9 +53,9 @@ refuseScene.on("text", async (ctx) => {
     // send message to author with notification about post
     await refuseSuggestion(suggestion, text);
     await ctx.reply("Пост отклонён!");
-    await ctx.reply(nextSuggestionText, getNextSuggestionKeyboard());
+    await ctx.reply(nextSuggestionText, getNextRefusedSuggestionKeyboard());
   } catch (error) {
-    await chatLogger(ctx, "Произошла ошибка...", error);
+    await errorHandler(ctx, error);
   }
 });
 
@@ -68,8 +67,9 @@ refuseScene.action(RefuseKeyboard.GetNextSuggestion, async (ctx) => {
       post: { photos: suggestion.fileIds, text: suggestion.caption },
       chatId: String(suggestion.userId),
     });
+    await ctx.reply("Что будем делать?", getRefuseMenuKeyboard());
   } catch (error) {
-    await chatLogger(ctx, "Произошла ошибка...", error);
+    await errorHandler(ctx, error);
   }
 });
 
@@ -82,9 +82,9 @@ refuseScene.action(RefuseKeyboard.ReturnSuggestion, async (ctx) => {
       userId: suggestion.userId,
     });
     await ctx.reply("Отмена отмены поста!😯");
-    await ctx.reply(nextSuggestionText, getNextSuggestionKeyboard());
+    await ctx.reply(nextSuggestionText, getNextRefusedSuggestionKeyboard());
   } catch (error) {
-    await chatLogger(ctx, "Произошла ошибка...", error);
+    await errorHandler(ctx, error);
   }
 });
 
@@ -92,9 +92,9 @@ refuseScene.action(RefuseKeyboard.UseDefaultPhrase, async (ctx) => {
   try {
     const suggestion = await getPreparedForRefuseSuggestion();
     await refuseSuggestion(suggestion, defaultText);
-    await ctx.reply(nextSuggestionText, getNextSuggestionKeyboard());
+    await ctx.reply(nextSuggestionText, getNextRefusedSuggestionKeyboard());
   } catch (error) {
-    await chatLogger(ctx, "Произошла ошибка...", error);
+    await errorHandler(ctx, error);
   }
 });
 
