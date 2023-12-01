@@ -11,7 +11,7 @@ import { ENCODING_FORMAT, SUGGESTION_PATH } from "../../const";
 type UserId = Suggestion["userId"];
 type SuggestionId = Suggestion["id"];
 
-const ACTIVE_SUGGESTION_STATUSES: SuggestionStatus[] = ["draft", "sent", "approved"];
+const ACTIVE_SUGGESTION_STATUSES: SuggestionStatus[] = ["draft", "sent", "approved", 'preparedForRefuse'];
 
 export const suggestionFileName = "suggestions.json";
 export const suggestionFilePath = `${SUGGESTION_PATH}/${suggestionFileName}`;
