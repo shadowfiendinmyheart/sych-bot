@@ -1,2 +1,2 @@
-export type callbackFunction = () => void;
-export type asyncCallbackFunction = () => Promise<void>;
+export type CallbackFunction = () => void;
+export type AsyncCallbackFunction = () => Promise<void>;

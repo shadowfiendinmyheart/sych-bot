@@ -1,16 +1,35 @@
 import { Context } from "telegraf";
 import { ERRORS } from "../const";
 
-const errorConsoler = (ctx: Context, error: any) => {
-  console.log("---");
-  console.log("error:", error);
-  console.log("ctx:", ctx);
-  console.log("---");
+interface ErrorHandlerParams {
+  ctx: Context;
+  error: any;
+}
+
+interface ErrorHandlerWithLoggerParams extends ErrorHandlerParams {
+  about?: string;
+}
+
+export const logger = (
+  ctx: Context,
+  x: any,
+  prefix: string = "something interesting:",
+) => {
+  console.log("-----");
+  console.log(`${prefix}: ${x}`);
+  console.log("ctx", ctx);
+  console.log("-----");
 };
 
-export const errorHandler = async (ctx: Context, error: any) => {
-  errorConsoler(ctx, error);
+export const errorHandlerWithLogger = async ({
+  about,
+  ...params
+}: ErrorHandlerWithLoggerParams) => {
+  logger(params.ctx, about, "ERROR");
+  errorHandler(params);
+};
 
+export const errorHandler = async ({ ctx, error }: ErrorHandlerParams) => {
   switch (error.message) {
     case ERRORS.WRONG_STATUS_SUGGESTION: {
       await ctx.reply("Неверный статус предложки");
@@ -22,13 +41,8 @@ export const errorHandler = async (ctx: Context, error: any) => {
       break;
     }
 
-    case ERRORS.EMPTY_USER_SUGGESTIONS: {
-      await ctx.reply("У вас нет предложки");
-      break;
-    }
-
     case ERRORS.ADMIN_EMPTY_SUGGESTION: {
-      await ctx.reply("Тут больше ничего нет...");
+      await ctx.reply("Из предложки тут больше ничего нет...");
       break;
     }
 

@@ -3,7 +3,7 @@ import { makePostToTg } from "../../services/api/tgApi";
 import { updateSuggestion } from "../../services/suggestion";
 
 import { SceneAlias } from "../../types/scenes";
-import { errorHandler } from "../utils";
+import { errorHandlerWithLogger } from "../utils";
 import {
   getNextRefusedSuggestionKeyboard,
   getPreparedForRefuseSuggestion,
@@ -40,7 +40,7 @@ refuseScene.enter(async (ctx) => {
     });
     await ctx.reply("Что будем делать?", getRefuseMenuKeyboard());
   } catch (error) {
-    await errorHandler(ctx, error);
+    await errorHandlerWithLogger({ ctx, error, about: "refuse scene enter" });
     await ctx.scene.enter(SceneAlias.Admin);
   }
 });
@@ -55,7 +55,7 @@ refuseScene.on("text", async (ctx) => {
     await ctx.reply("Пост отклонён!");
     await ctx.reply(nextSuggestionText, getNextRefusedSuggestionKeyboard());
   } catch (error) {
-    await errorHandler(ctx, error);
+    await errorHandlerWithLogger({ ctx, error, about: "refuse scene on text" });
   }
 });
 
@@ -69,7 +69,11 @@ refuseScene.action(RefuseKeyboard.GetNextSuggestion, async (ctx) => {
     });
     await ctx.reply("Что будем делать?", getRefuseMenuKeyboard());
   } catch (error) {
-    await errorHandler(ctx, error);
+    await errorHandlerWithLogger({
+      ctx,
+      error,
+      about: "refuse scene get next suggestion",
+    });
   }
 });
 
@@ -84,7 +88,11 @@ refuseScene.action(RefuseKeyboard.ReturnSuggestion, async (ctx) => {
     await ctx.reply("Отмена отмены поста!😯");
     await ctx.reply(nextSuggestionText, getNextRefusedSuggestionKeyboard());
   } catch (error) {
-    await errorHandler(ctx, error);
+    await errorHandlerWithLogger({
+      ctx,
+      error,
+      about: "refuse scene return suggestion",
+    });
   }
 });
 
@@ -94,7 +102,11 @@ refuseScene.action(RefuseKeyboard.UseDefaultPhrase, async (ctx) => {
     await refuseSuggestion(suggestion, defaultText);
     await ctx.reply(nextSuggestionText, getNextRefusedSuggestionKeyboard());
   } catch (error) {
-    await errorHandler(ctx, error);
+    await errorHandlerWithLogger({
+      ctx,
+      error,
+      about: "refuse scene use default phrase",
+    });
   }
 });
 
@@ -107,7 +119,7 @@ refuseScene.command("back", async (ctx) => {
 });
 
 refuseScene.command(DEFAULT_CODE_PHRASE, async (ctx) => {
-  // set default code phrase
+  // TODO set default code phrase
 });
 
 export default refuseScene;

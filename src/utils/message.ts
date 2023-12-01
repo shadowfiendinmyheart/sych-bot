@@ -3,6 +3,7 @@ import { ExtraEditMessageText } from "telegraf/typings/telegram-types";
 import { Message } from "typegram";
 import config from "../config";
 import { MAX_TG_MESSAGE_LENGTH } from "../const";
+import { logger } from "../scenes/utils";
 import awaiter from "./awaiter";
 
 const telegram: Telegram = new Telegram(config.BOT_TOKEN as string);
@@ -66,15 +67,10 @@ export const editMessageCaption = async (messageId: number, newCaption: string) 
 export const chatLogger = async (
   ctx: Context,
   message: string,
-  consoleError?: any,
   timeMessageAlive = 60000,
 ) => {
   try {
-    console.log(message);
-    if (consoleError) {
-      console.log("extended error:\n", consoleError);
-    }
-    console.log("---");
+    logger(ctx, message, "message from chatLogger");
     const infoMessage = await ctx.reply(message);
     await awaiter(timeMessageAlive);
     await ctx.deleteMessage(infoMessage.message_id);

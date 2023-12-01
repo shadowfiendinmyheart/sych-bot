@@ -1,9 +1,9 @@
 import { Context } from "telegraf";
-import { callbackFunction } from "../types/functions";
+import { CallbackFunction } from "../types/functions";
 
 export const stopLoadingInlineButton = async (
   ctx: Context,
-  next: callbackFunction,
+  next: CallbackFunction,
 ) => {
   if (ctx.callbackQuery) {
     await ctx.answerCbQuery();

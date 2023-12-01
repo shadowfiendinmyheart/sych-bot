@@ -1,3 +1,3 @@
-export const adminIds = [625269183];
+export const adminIds = process.env.ADMIN_IDS?.split(",") || [];
 
-export const checkIsAdmin = (userId: number) => adminIds.includes(Number(userId));
+export const checkIsAdmin = (userId: number) => adminIds.includes(String(userId));

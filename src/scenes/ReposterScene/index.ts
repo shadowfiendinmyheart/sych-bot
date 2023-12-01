@@ -21,6 +21,7 @@ import {
   editMessageCaption,
   getMessageWithSourceLink,
 } from "../../utils/message";
+import { errorHandlerWithLogger } from "../utils";
 
 export enum KeyboardAction {
   On = "On",
@@ -40,19 +41,19 @@ reposterScene.enter(async (ctx) => {
 
 reposterScene.action(KeyboardAction.On, async (ctx) => {
   if (interval) {
-    ctx.reply("Репостер уже работает");
+    await ctx.reply("Репостер уже работает");
     return;
   }
 
   interval = setInterval(async () => {
     await makeRepost(ctx);
   }, CHECK_PERIOD);
-  ctx.reply("Репостер включился!");
+  await ctx.reply("Репостер включился!");
 });
 
 reposterScene.action(KeyboardAction.Off, async (ctx) => {
   if (!interval) {
-    ctx.reply("Репостер уже отключен");
+    await ctx.reply("Репостер уже отключен");
     return;
   }
   clearInterval(interval);
@@ -68,7 +69,7 @@ reposterScene.action(KeyboardAction.MakePost, async (ctx) => {
   try {
     const counter = Number(getPostCounter());
     if (counter === 100) {
-      ctx.reply("100 запись!");
+      await ctx.reply("100 запись!");
       return;
     }
 
@@ -90,7 +91,7 @@ reposterScene.action(KeyboardAction.MakePost, async (ctx) => {
     const updatedCounter = getPostCounter();
     await chatLogger(ctx, `Successul🍀\ncurrent post counter ${updatedCounter}`);
   } catch (error: any) {
-    await chatLogger(ctx, "error while sending post...", error);
+    await errorHandlerWithLogger({ ctx, error, about: "reposter scene make post" });
   }
 });
 
@@ -101,7 +102,11 @@ reposterScene.action(KeyboardAction.UpdatePosts, async (ctx) => {
     setPostCounter(0);
     await chatLogger(ctx, "posts updated!");
   } catch (error) {
-    console.log("fail on update posts\nerr:", error);
+    await errorHandlerWithLogger({
+      ctx,
+      error,
+      about: "reposter scene update posts",
+    });
   }
 });
 

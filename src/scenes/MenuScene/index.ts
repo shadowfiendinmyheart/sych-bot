@@ -1,9 +1,9 @@
 import { Scenes } from "telegraf";
 
-import { getMenuKeyboard } from "./utils";
-
 import { SceneAlias } from "../../types/scenes";
 import { checkIsAdmin } from "../../utils/user";
+import { errorHandlerWithLogger } from "../utils";
+import { getMenuKeyboard } from "./utils";
 
 export enum KeyboardAction {
   Suggestion = "Suggestion",
@@ -15,14 +15,18 @@ export enum KeyboardAction {
 const menuScene = new Scenes.BaseScene<Scenes.SceneContext>(SceneAlias.Menu);
 
 menuScene.enter(async (ctx) => {
-  const userId = ctx.from?.id;
-  if (!userId) {
-    await ctx.reply("Выберите нужный пункт меню", getMenuKeyboard(false));
-    return;
-  }
+  try {
+    const userId = ctx.from?.id;
+    if (!userId) {
+      await ctx.reply("Выберите нужный пункт меню", getMenuKeyboard(false));
+      return;
+    }
 
-  const isAdmin = checkIsAdmin(userId);
-  await ctx.reply("Выберите нужный пункт меню", getMenuKeyboard(isAdmin));
+    const isAdmin = checkIsAdmin(userId);
+    await ctx.reply("Выберите нужный пункт меню", getMenuKeyboard(isAdmin));
+  } catch (error) {
+    await errorHandlerWithLogger({ ctx, error, about: "menu scene enter" });
+  }
 });
 
 menuScene.action(KeyboardAction.Suggestion, async (ctx) => {

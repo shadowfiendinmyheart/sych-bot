@@ -4,7 +4,7 @@ import { stopLoadingInlineButton } from "./middlewares/inlineKeyboardMiddleware"
 
 import { debugLogger } from "./middlewares/logger";
 
-import authScene from "./scenes/MenuScene";
+import menuScene from "./scenes/MenuScene";
 import suggestionScene from "./scenes/SuggestionScene";
 import reposterScene from "./scenes/ReposterScene";
 import photoSuggestionScene from "./scenes/PhotoSuggestionScene";
@@ -14,21 +14,24 @@ import refuseScene from "./scenes/RefuseScene";
 
 import { SceneAlias } from "./types/scenes";
 import { initFiles } from "./utils/init";
+import { unexceptedUserInputHandler } from "./utils/sceneHandler";
 
 if (!config.BOT_TOKEN) {
   throw Error("BOT_TOKEN must be provided!");
 }
 
 const bot = new Telegraf<Scenes.SceneContext>(config.BOT_TOKEN as string);
-const stage = new Scenes.Stage<Scenes.SceneContext>([
-  authScene,
+const scenes = [
+  menuScene,
   suggestionScene,
   reposterScene,
   photoSuggestionScene,
   descriptionSuggestionScene,
   adminScene,
   refuseScene,
-]);
+];
+const stage = new Scenes.Stage<Scenes.SceneContext>(scenes);
+unexceptedUserInputHandler(scenes);
 
 bot.use(debugLogger);
 bot.use(stopLoadingInlineButton);

@@ -1,8 +1,8 @@
-import { Markup, Scenes } from "telegraf";
+import { Scenes } from "telegraf";
 
 import { SceneAlias } from "../../types/scenes";
 import { ERRORS, MAX_TG_MESSAGE_LENGTH } from "../../const";
-import { errorHandler } from "../utils";
+import { errorHandlerWithLogger } from "../utils";
 import { getUserDraftSuggestion, updateSuggestion } from "../../services/suggestion";
 import {
   getDescriptionSuggestionKeyboard,
@@ -22,7 +22,7 @@ descriptionSuggestionScene.enter(async (ctx) => {
   try {
     const userId = ctx.chat?.id || 0;
     const draftSuggestion = await getUserDraftSuggestion(userId);
-    if (!draftSuggestion) throw ERRORS.EMPTY_SUGGESTION;
+    if (!draftSuggestion) throw ERRORS.WRONG_STATUS_SUGGESTION;
 
     await ctx.reply(
       getTextWithDescriptionSuggestionHint(
@@ -32,7 +32,7 @@ descriptionSuggestionScene.enter(async (ctx) => {
       getDescriptionSuggestionKeyboard(draftSuggestion),
     );
   } catch (error) {
-    await errorHandler(ctx, error);
+    await errorHandlerWithLogger({ ctx, error, about: "description scene enter" });
     await ctx.scene.enter(SceneAlias.Suggestion);
   }
 });
@@ -43,7 +43,7 @@ descriptionSuggestionScene.on("text", async (ctx) => {
 
   try {
     const draftSuggestion = await getUserDraftSuggestion(userId);
-    if (!draftSuggestion) throw Error(ERRORS.EMPTY_SUGGESTION);
+    if (!draftSuggestion) throw Error(ERRORS.WRONG_STATUS_SUGGESTION);
     if (text === DescriptionKeyboard.Delete) {
       if (!draftSuggestion.caption) {
         await ctx.reply("У вашей предложки пока нет описания...");
@@ -84,7 +84,7 @@ descriptionSuggestionScene.on("text", async (ctx) => {
       getDescriptionSuggestionKeyboard(updatedSuggestion),
     );
   } catch (error) {
-    await errorHandler(ctx, error);
+    await errorHandlerWithLogger({ ctx, error, about: "description scene on text" });
     await ctx.scene.enter(SceneAlias.Suggestion);
   }
 });

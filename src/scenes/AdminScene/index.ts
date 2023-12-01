@@ -8,9 +8,8 @@ import {
   getNextSuggestionKeyboard,
   getResolveSuggestionKeyboard,
 } from "./utils";
-import { chatLogger } from "../../utils/message";
 import { getPreparedForRefuseSuggestion } from "../RefuseScene/utils";
-import { errorHandler } from "../utils";
+import { errorHandlerWithLogger } from "../utils";
 import { ERRORS } from "../../const";
 
 export enum MenuKeyboardAction {
@@ -28,25 +27,37 @@ export enum SuggestionKeyboardAction {
 const adminScene = new Scenes.BaseScene<Scenes.SceneContext>(SceneAlias.Admin);
 
 adminScene.enter(async (ctx) => {
-  await ctx.reply("admin menu 😎🤙🏻", getAdminKeyboard());
+  try {
+    await ctx.reply("admin menu 😎🤙🏻", getAdminKeyboard());
+  } catch (error) {
+    await errorHandlerWithLogger({ ctx, error, about: "enter admin scene" });
+    await ctx.scene.enter(SceneAlias.Menu);
+  }
 });
 
 adminScene.action(MenuKeyboardAction.GetSuggestions, async (ctx) => {
-  const chatId = ctx.chat?.id || 0;
-  const sentSuggestions = await getSuggestionsByStatus("sent");
-  if (sentSuggestions.length === 0) {
-    await ctx.reply("В предложке пусто...");
-    return;
+  try {
+    const chatId = ctx.chat?.id || 0;
+    const sentSuggestions = await getSuggestionsByStatus("sent");
+    if (sentSuggestions.length === 0) {
+      await ctx.reply("В предложке пусто...");
+      return;
+    }
+
+    const currentSuggestion = sentSuggestions[0];
+    await makePostToTg({
+      post: { photos: currentSuggestion.fileIds, text: currentSuggestion.caption },
+      chatId: String(chatId),
+    });
+
+    await ctx.reply("Норм?", getResolveSuggestionKeyboard());
+  } catch (error) {
+    await errorHandlerWithLogger({
+      ctx,
+      error,
+      about: "admin scene get suggestions",
+    });
   }
-
-  const currentSuggestion = sentSuggestions[0];
-
-  await makePostToTg({
-    post: { photos: currentSuggestion.fileIds, text: currentSuggestion.caption },
-    chatId: String(chatId),
-  });
-
-  await ctx.reply("Норм?", getResolveSuggestionKeyboard());
 });
 
 adminScene.action(
@@ -58,7 +69,11 @@ adminScene.action(
 
       await ctx.scene.enter(SceneAlias.Refuse);
     } catch (error) {
-      await errorHandler(ctx, error);
+      await errorHandlerWithLogger({
+        ctx,
+        error,
+        about: "admin scene get prepared for refuse suggestion",
+      });
     }
   },
 );
@@ -98,7 +113,7 @@ adminScene.action(SuggestionKeyboardAction.Approve, async (ctx) => {
     await ctx.reply("Пост одобрен и успешно выложен!");
     await ctx.reply("Показать следующий пост?", getNextSuggestionKeyboard());
   } catch (error) {
-    await chatLogger(ctx, "Произошла ошибка...", error);
+    await errorHandlerWithLogger({ ctx, error, about: "admin scene approve" });
   }
 });
 
@@ -114,7 +129,7 @@ adminScene.action(SuggestionKeyboardAction.Refuse, async (ctx) => {
 
     await ctx.reply("Показать следующий пост?", getNextSuggestionKeyboard());
   } catch (error) {
-    await chatLogger(ctx, "Произошла ошибка...", error);
+    await errorHandlerWithLogger({ ctx, error, about: "admin scene refuse" });
   }
 });
 

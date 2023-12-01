@@ -8,7 +8,7 @@ import {
 } from "../../services/suggestion";
 import { Suggestion } from "../../types/suggestion";
 import { generateSuggestionWithInitialFields } from "../../utils/suggestion";
-import { errorHandler } from "../utils";
+import { errorHandlerWithLogger } from "../utils";
 
 export const getIsAllowPhotoDelete = (suggestion: Suggestion) =>
   suggestion.fileIds.length > 0;
@@ -79,7 +79,11 @@ export const uploadPhoto = async (ctx: any, userId: number, photoIds: string[]) 
       getPhotoSuggestionKeyboard(updatedSuggestion),
     );
   } catch (error) {
-    await errorHandler(ctx, error);
+    await errorHandlerWithLogger({
+      ctx,
+      error,
+      about: "photo suggestion scene upload photo",
+    });
   } finally {
     delete userPhotosBuffer[String(userId)];
   }

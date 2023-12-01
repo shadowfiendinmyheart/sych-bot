@@ -10,7 +10,7 @@ import {
   userPhotosBuffer,
 } from "./utils";
 import { ERRORS } from "../../const";
-import { errorHandler } from "../utils";
+import { errorHandlerWithLogger } from "../utils";
 
 export enum PhotoSuggestionKeyboard {
   Delete = "Удалить",
@@ -27,7 +27,7 @@ photoSuggestionScene.enter(async (ctx) => {
   try {
     const userId = ctx.chat?.id || 0;
     const draftSuggestion = await getUserDraftSuggestion(userId);
-    if (!draftSuggestion) throw ERRORS.EMPTY_SUGGESTION;
+    if (!draftSuggestion) throw ERRORS.WRONG_STATUS_SUGGESTION;
 
     await ctx.reply(
       getTextWithPhotoSuggestionHint(
@@ -37,7 +37,11 @@ photoSuggestionScene.enter(async (ctx) => {
       getPhotoSuggestionKeyboard(draftSuggestion),
     );
   } catch (error) {
-    await errorHandler(ctx, error);
+    await errorHandlerWithLogger({
+      ctx,
+      error,
+      about: "photo suggestion scene enter",
+    });
     await ctx.scene.enter(SceneAlias.Suggestion);
   }
 });
@@ -60,8 +64,7 @@ photoSuggestionScene.on("text", async (ctx) => {
   try {
     const userId = ctx.message.from.id;
     const draftSuggestion = await getUserDraftSuggestion(userId);
-
-    if (!draftSuggestion) throw Error(ERRORS.EMPTY_SUGGESTION);
+    if (!draftSuggestion) throw Error(ERRORS.WRONG_STATUS_SUGGESTION);
 
     const text = ctx.message.text;
 
@@ -89,7 +92,11 @@ photoSuggestionScene.on("text", async (ctx) => {
 
     await ctx.reply("Неизвестная команда...");
   } catch (error) {
-    await errorHandler(ctx, error);
+    await errorHandlerWithLogger({
+      ctx,
+      error,
+      about: "photo suggestion scene on text",
+    });
     await ctx.scene.enter(SceneAlias.Suggestion);
   }
 });

@@ -7,7 +7,7 @@ import {
   saveSuggestion,
   updateSuggestion,
 } from "../../services/suggestion";
-import { errorHandler } from "../utils";
+import { errorHandlerWithLogger } from "../utils";
 import { Suggestion } from "../../types/suggestion";
 import {
   generateSuggestionWithInitialFields,
@@ -40,7 +40,7 @@ suggestionScene.enter(async (ctx) => {
 
     await ctx.reply(welcomeSceneText, getSuggestionKeyboard(activeSuggestion));
   } catch (error) {
-    await errorHandler(ctx, error);
+    await errorHandlerWithLogger({ ctx, error, about: "suggestion scene enter" });
     ctx.scene.enter(SceneAlias.Menu);
   }
 });
@@ -57,7 +57,6 @@ suggestionScene.action(KeyboardAction.Show, async (ctx) => {
 
   try {
     const activeSuggestion = await getUserActiveSuggestion(userId);
-
     if (!activeSuggestion) throw Error(ERRORS.EMPTY_SUGGESTION);
 
     if (
@@ -84,7 +83,11 @@ suggestionScene.action(KeyboardAction.Show, async (ctx) => {
     }
     await ctx.reply(welcomeSceneText, getSuggestionKeyboard(activeSuggestion));
   } catch (error) {
-    errorHandler(ctx, error);
+    await errorHandlerWithLogger({
+      ctx,
+      error,
+      about: "suggestion scene show suggestion",
+    });
   }
 });
 
@@ -97,7 +100,11 @@ suggestionScene.action(KeyboardAction.Photo, async (ctx) => {
 
     await ctx.scene.enter(SceneAlias.PhotoSuggestion);
   } catch (error) {
-    errorHandler(ctx, error);
+    await errorHandlerWithLogger({
+      ctx,
+      error,
+      about: "suggestion scene enter photo scene",
+    });
   }
 });
 
@@ -110,7 +117,11 @@ suggestionScene.action(KeyboardAction.Description, async (ctx) => {
 
     await ctx.scene.enter(SceneAlias.DescriptionSuggestion);
   } catch (error) {
-    errorHandler(ctx, error);
+    await errorHandlerWithLogger({
+      ctx,
+      error,
+      about: "suggestion scene enter description scene",
+    });
   }
 });
 
@@ -143,7 +154,11 @@ suggestionScene.action(KeyboardAction.Send, async (ctx) => {
       getSuggestionKeyboard(updatedSuggestion),
     );
   } catch (error) {
-    errorHandler(ctx, error);
+    await errorHandlerWithLogger({
+      ctx,
+      error,
+      about: "suggestion scene send suggestion",
+    });
   }
 });
 
@@ -152,8 +167,7 @@ suggestionScene.action(KeyboardAction.ToDraft, async (ctx) => {
   try {
     const userId = ctx.from?.id || 0;
     const activeSuggestion = await getUserActiveSuggestion(userId);
-
-    if (!activeSuggestion) throw Error(ERRORS.EMPTY_SUGGESTION);
+    if (!activeSuggestion) throw Error(ERRORS.WRONG_STATUS_SUGGESTION);
 
     if (activeSuggestion.status !== "sent") {
       await ctx.reply("Неверный статус предложки");
@@ -171,7 +185,11 @@ suggestionScene.action(KeyboardAction.ToDraft, async (ctx) => {
       getSuggestionKeyboard(updatedSuggestion),
     );
   } catch (error) {
-    errorHandler(ctx, error);
+    await errorHandlerWithLogger({
+      ctx,
+      error,
+      about: "suggestion scene to draft suggestion",
+    });
   }
 });
 
@@ -194,7 +212,11 @@ suggestionScene.action(KeyboardAction.Delete, async (ctx) => {
       getSuggestionKeyboard(initSuggestion),
     );
   } catch (error) {
-    errorHandler(ctx, error);
+    await errorHandlerWithLogger({
+      ctx,
+      error,
+      about: "suggestion scene delete suggestion",
+    });
   }
 });
 
