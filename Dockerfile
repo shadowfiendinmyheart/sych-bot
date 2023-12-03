@@ -9,4 +9,4 @@ COPY . ./
 ARG ENV
 # https://www.reddit.com/r/docker/comments/hn3e1o/conditional_statement_with_arg_in_dockerfile/
 ENV ENV ${ENV}
-CMD if [ "$ENV" = "production" ] ; then npm run start ; else npm run dev ; fi
+CMD if [ "$ENV" = "production" ] ; then npm run start ; else npm run devNode ; fi

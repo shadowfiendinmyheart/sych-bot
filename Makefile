@@ -4,7 +4,7 @@ IMAGE_NAME_PRODUCTION ?= ${IMAGE_NAME}-production
 CONTAINER_NAME ?= sych-bot-container
 VOLUME_CONTAINER_PATH ?= /app/public
 VOLUME_DIRECTORY ?= data
-VOLUME_HOST_PATH ?= $(PWD)/${VOLUME_DIRECTORY}
+VOLUME_HOST_PATH ?= $(pwd)/${VOLUME_DIRECTORY}
 
 init:
 	mkdir data
@@ -15,7 +15,7 @@ run-prod:
 build-dev:
 	docker build -t ${IMAGE_NAME_DEV} . --build-arg ENV=development
 run-dev:
-	docker run --name ${CONTAINER_NAME} -v $(PWD):/app -v ${VOLUME_HOST_PATH}:${VOLUME_CONTAINER_PATH} -d --rm ${IMAGE_NAME_DEV}
+	docker run --name ${CONTAINER_NAME} -v $(pwd):/app -v ${VOLUME_HOST_PATH}:${VOLUME_CONTAINER_PATH} -d --rm ${IMAGE_NAME_DEV}
 stop:
 	docker stop ${CONTAINER_NAME}
 delete:
