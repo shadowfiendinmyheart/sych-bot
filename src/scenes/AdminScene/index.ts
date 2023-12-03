@@ -1,7 +1,7 @@
 import { Scenes } from "telegraf";
 
 import { SceneAlias } from "../../types/scenes";
-import { makeMessageToTg, makePostToTg } from "../../services/api/tgApi";
+import { makeMessageToTg, makePostToTg } from "../../services/api/tg/tgApi";
 import { getSuggestionsByStatus, updateSuggestion } from "../../services/suggestion";
 import {
   getAdminKeyboard,

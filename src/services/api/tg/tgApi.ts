@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Markup } from "telegraf";
 import { InlineKeyboardMarkup } from "telegraf/typings/core/types/typegram";
-import config from "../../config";
+import config from "../../../config";
 
 interface TgPost {
   text?: string;

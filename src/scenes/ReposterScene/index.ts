@@ -14,14 +14,15 @@ import {
 } from "./utils";
 
 import { SceneAlias } from "../../types/scenes";
-import { getVkPostById } from "../../services/api/vkApi";
-import { makePostToTg } from "../../services/api/tgApi";
+import { getVkPostById } from "../../services/api/vk/vkApi";
+import { makePostToTg } from "../../services/api/tg/tgApi";
 import {
   chatLogger,
   editMessageCaption,
   getMessageWithSourceLink,
 } from "../../utils/message";
 import { errorHandlerWithLogger } from "../utils";
+import { ERRORS } from "../../const";
 
 export enum KeyboardAction {
   On = "On",
@@ -75,6 +76,7 @@ reposterScene.action(KeyboardAction.MakePost, async (ctx) => {
 
     const posts = getFilePosts("sorted");
     const curPost = await getVkPostById(posts[counter].id);
+    if (!curPost) throw Error(ERRORS.GET_VK_POST);
     const messageWithSourceLink = getMessageWithSourceLink(
       curPost.text,
       `${config.VK_POST_LINK}${curPost.id}`,

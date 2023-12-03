@@ -16,4 +16,6 @@ export const ERRORS = {
   EMPTY_SUGGESTION: "empty suggestion error",
   ADMIN_EMPTY_SUGGESTION: "adming empty suggestion error",
   SAVE_SUGGESTION: "save suggestion error",
+  GET_VK_POST: "get vk post error",
+  GET_RANDOM_VK_POST: "get random vk post error",
 };

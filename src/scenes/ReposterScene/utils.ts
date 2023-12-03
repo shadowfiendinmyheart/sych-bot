@@ -6,11 +6,11 @@ import {
   checkIsValid,
   getVkLastPost,
   getVkPosts,
-  VkPost,
-} from "../../services/api/vkApi";
-import { makePostToTg } from "../../services/api/tgApi";
+} from "../../services/api/vk/vkApi";
+import { makePostToTg } from "../../services/api/tg/tgApi";
 import {
   ENCODING_FORMAT,
+  ERRORS,
   POSTS_FILE_NAME,
   POSTS_PATH,
   SORTED_POSTS_FILE_NAME,
@@ -18,6 +18,7 @@ import {
 import awaiter from "../../utils/awaiter";
 import config from "../../config";
 import { editMessageCaption, getMessageWithSourceLink } from "../../utils/message";
+import { VkPost } from "../../services/api/vk/interfaces";
 
 interface PostData {
   id: number;
@@ -40,6 +41,7 @@ export const CHECK_PERIOD = 1_800_000; // 30 minutes
 export const makeRepost = async (ctx: any) => {
   try {
     const vkPost = await getVkLastPost();
+    if (!vkPost) throw Error(ERRORS.GET_VK_POST);
 
     const isPosted = checkIsPosted(Number(vkPost.date));
     if (isPosted) {
@@ -109,8 +111,9 @@ export const updateFilePosts = async () => {
   let offset = 1;
   let newPosts;
   do {
-    newPosts = await getVkPosts(offset);
+    newPosts = (await getVkPosts(offset)) || [];
     if (newPosts.length < 90) {
+      // останавливаемся, если посты заканчиваются
       break;
     }
 

@@ -1,7 +1,7 @@
 import { Markup } from "telegraf";
 import { RefuseKeyboard } from ".";
 import { ERRORS } from "../../const";
-import { makeMessageToTg, makePostToTg } from "../../services/api/tgApi";
+import { makeMessageToTg, makePostToTg } from "../../services/api/tg/tgApi";
 import { getSuggestionsByStatus, updateSuggestion } from "../../services/suggestion";
 import { Suggestion } from "../../types/suggestion";
 

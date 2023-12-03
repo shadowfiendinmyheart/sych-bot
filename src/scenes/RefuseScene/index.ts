@@ -1,5 +1,5 @@
 import { Scenes } from "telegraf";
-import { makePostToTg } from "../../services/api/tgApi";
+import { makePostToTg } from "../../services/api/tg/tgApi";
 import { updateSuggestion } from "../../services/suggestion";
 
 import { SceneAlias } from "../../types/scenes";

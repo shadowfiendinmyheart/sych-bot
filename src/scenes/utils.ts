@@ -10,11 +10,7 @@ interface ErrorHandlerWithLoggerParams extends ErrorHandlerParams {
   about?: string;
 }
 
-export const logger = (
-  ctx: Context,
-  x: any,
-  prefix: string = "something interesting:",
-) => {
+export const logger = (ctx: Context, x: any, prefix = "something interesting:") => {
   console.log("-----");
   console.log(`${prefix}: ${x}`);
   console.log("ctx", ctx);
@@ -48,6 +44,18 @@ export const errorHandler = async ({ ctx, error }: ErrorHandlerParams) => {
 
     case ERRORS.SAVE_SUGGESTION: {
       await ctx.reply("Во время сохранения предложки произошла ошибка");
+      break;
+    }
+
+    case ERRORS.GET_VK_POST: {
+      await ctx.reply("Ошибка запроса к серверам VK");
+      break;
+    }
+
+    case ERRORS.GET_RANDOM_VK_POST: {
+      await ctx.reply(
+        "Упс! Произошла ошибка. Сейчас эта функция временно недоступна :(",
+      );
       break;
     }
 

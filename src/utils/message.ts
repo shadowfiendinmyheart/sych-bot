@@ -54,9 +54,13 @@ export const getMessageWithSourceLink = (message: string, link: string) => {
   return messageWithLink;
 };
 
-export const editMessageCaption = async (messageId: number, newCaption: string) => {
+export const editMessageCaption = async (
+  messageId: number,
+  newCaption: string,
+  chatId?: string,
+) => {
   await telegram.editMessageCaption(
-    String(config.TG_GROUP_ID),
+    String(chatId || config.TG_GROUP_ID),
     messageId,
     undefined,
     newCaption,
