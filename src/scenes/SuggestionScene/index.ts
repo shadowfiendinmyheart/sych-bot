@@ -11,9 +11,13 @@ import { errorHandlerWithLogger } from "../utils";
 import { Suggestion } from "../../types/suggestion";
 import {
   generateSuggestionWithInitialFields,
-  getSuggestionStatusText,
+  getSuggestionStatusForUsersText,
 } from "../../utils/suggestion";
-import { getSuggestionKeyboard, KeyboardAction } from "./utils";
+import {
+  getSuggestionKeyboard,
+  helpHtmlSuggestionScene,
+  KeyboardAction,
+} from "./utils";
 import { SceneAlias } from "../../types/scenes";
 import { ERRORS } from "../../const";
 
@@ -45,11 +49,6 @@ suggestionScene.enter(async (ctx) => {
   }
 });
 
-// Назад
-suggestionScene.action(KeyboardAction.Back, async (ctx) => {
-  ctx.scene.enter(SceneAlias.Menu);
-});
-
 // Показать предложку
 suggestionScene.action(KeyboardAction.Show, async (ctx) => {
   const chatId = ctx.chat?.id || 0;
@@ -68,7 +67,9 @@ suggestionScene.action(KeyboardAction.Show, async (ctx) => {
     }
 
     await ctx.reply(
-      `Статус вашей предложки — ${getSuggestionStatusText(activeSuggestion.status)}`,
+      `Статус вашей предложки — ${getSuggestionStatusForUsersText(
+        activeSuggestion.status,
+      )}`,
     );
     if (activeSuggestion.fileIds.length > 0) {
       await makePostToTg({
@@ -218,6 +219,24 @@ suggestionScene.action(KeyboardAction.Delete, async (ctx) => {
       about: "suggestion scene delete suggestion",
     });
   }
+});
+
+// Помощь
+suggestionScene.action(KeyboardAction.Help, async (ctx) => {
+  try {
+    const userId = ctx.chat?.id || 0;
+    const activeSuggestion = await getUserActiveSuggestion(userId);
+    if (!activeSuggestion) throw ERRORS.EMPTY_SUGGESTION;
+    await ctx.replyWithHTML(helpHtmlSuggestionScene);
+    await ctx.reply(welcomeSceneText, getSuggestionKeyboard(activeSuggestion));
+  } catch (error) {
+    errorHandlerWithLogger({ ctx, error, about: "suggestion scene help" });
+  }
+});
+
+// Назад
+suggestionScene.action(KeyboardAction.Back, async (ctx) => {
+  await ctx.scene.enter(SceneAlias.Menu);
 });
 
 suggestionScene.on("text", async (ctx) => {

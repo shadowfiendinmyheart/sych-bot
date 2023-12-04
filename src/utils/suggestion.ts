@@ -1,13 +1,13 @@
 import { Suggestion, SuggestionStatus } from "../types/suggestion";
 import { PartialWithRequired } from "../types/utils";
 
-export const getSuggestionStatusText = (status: SuggestionStatus) => {
+export const getSuggestionStatusForUsersText = (status: SuggestionStatus) => {
   const textByStatus: { [k in SuggestionStatus]: string } = {
     draft: "Черновик",
     sent: "Отправлено на рассмотрение",
     approved: "Одобрено",
     posted: "Опубликовано",
-    preparedForRefuse: "Подготовлено к отказу",
+    preparedForRefuse: "Отправлено на рассмотрение",
     refused: "Отказано",
   };
 

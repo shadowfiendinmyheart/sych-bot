@@ -8,12 +8,8 @@ export const getMenuKeyboard = (ctx: Context) => {
 
   const buttons = [
     [Markup.button.callback("Предложка", KeyboardAction.Suggestion)],
-    [
-      Markup.button.callback(
-        "Получить рандомный пост из паблика VK",
-        KeyboardAction.GetRandomVkPost,
-      ),
-    ],
+    [Markup.button.callback("Случайная сычевальня", KeyboardAction.GetRandomVkPost)],
+    [Markup.button.callback("Помощь", KeyboardAction.Help)],
   ];
   if (isAdmin) {
     buttons.push([
@@ -44,3 +40,6 @@ export const isAllowToMakeRequest = (userId: number): boolean => {
   userRequests[userId] = { timestamp: now };
   return true;
 };
+
+export const helpHtmlMenuScene =
+  '<b>Предложка</b> — отправить предложку для публикации в канале @your_sychevalnya\n<b>Случайная сычевальня</b> — бот присылает случайную сычевальню из <a href="https://vk.com/your_sychevalnya">паблика в ВК</a>\n\nПо любым вопросам и предложениям — @shadowfiend15yo';

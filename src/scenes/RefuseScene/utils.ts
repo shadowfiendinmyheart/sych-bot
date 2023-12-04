@@ -42,12 +42,12 @@ export const getPreparedForRefuseSuggestion = async () => {
 
 export const refuseSuggestion = async (suggestion: Suggestion, cause: string) => {
   const chatId = String(suggestion.userId);
-  await makeMessageToTg({ chatId: chatId, text: "Ваш пост отклонён" });
+  await makeMessageToTg({ chatId: chatId, text: "Ваш пост:" });
   await makePostToTg({
     post: { photos: suggestion.fileIds, text: suggestion.caption },
     chatId,
   });
-  await makeMessageToTg({ chatId: chatId, text: `По причине:\n${cause}` });
+  await makeMessageToTg({ chatId: chatId, text: `Отклонён по причине:\n${cause}` });
   await makeMessageToTg({
     chatId: chatId,
     text: `Можете модифицировать вашу предложку и отправить её на повторное рассмотрение`,

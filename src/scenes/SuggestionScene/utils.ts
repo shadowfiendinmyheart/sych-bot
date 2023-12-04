@@ -11,6 +11,7 @@ export enum KeyboardAction {
   Send = "Send",
   ToDraft = "ToDraft",
   Delete = "Delete",
+  Help = "Help",
 }
 
 export const getSuggestionKeyboard = (suggestion: Suggestion) => {
@@ -50,6 +51,7 @@ export const getSuggestionKeyboard = (suggestion: Suggestion) => {
     ]);
   }
 
+  buttons.push([Markup.button.callback("Помощь", KeyboardAction.Help)]);
   buttons.push([Markup.button.callback("Назад", KeyboardAction.Back)]);
   return Markup.inlineKeyboard(buttons);
 };
@@ -74,3 +76,6 @@ export const savePhotoInFolder = async (
       });
   });
 };
+
+export const helpHtmlSuggestionScene =
+  "<b>Отправить</b> предложку можно после добавления фотографий\nПосле отправки, через некоторое время Вам придёт уведомление, об одобрении или отказе в публикации\nТакже можно <b>возвратить</b> предложку, если Вы передумали или хотите доработать её";

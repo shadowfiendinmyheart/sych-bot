@@ -61,11 +61,13 @@ refuseScene.on("text", async (ctx) => {
 
 refuseScene.action(RefuseKeyboard.GetNextSuggestion, async (ctx) => {
   try {
+    const chatId = ctx.chat?.id;
+
     const suggestion = await getPreparedForRefuseSuggestion();
     await ctx.reply("Отклоняемый пост:");
     await makePostToTg({
       post: { photos: suggestion.fileIds, text: suggestion.caption },
-      chatId: String(suggestion.userId),
+      chatId: String(chatId),
     });
     await ctx.reply("Что будем делать?", getRefuseMenuKeyboard());
   } catch (error) {
