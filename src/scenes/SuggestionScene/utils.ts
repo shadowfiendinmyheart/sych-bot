@@ -1,7 +1,9 @@
 import * as fs from "fs";
 import axios from "axios";
-import { Markup } from "telegraf";
+import { Context, Markup } from "telegraf";
 import { Suggestion } from "../../types/suggestion";
+import { adminIds } from "../../utils/user";
+import { makeMessageToTg } from "../../services/api/tg/tgApi";
 
 export enum KeyboardAction {
   Back = "Back",
@@ -75,6 +77,18 @@ export const savePhotoInFolder = async (
         reject(e);
       });
   });
+};
+
+export const notifyAdminsAboutSuggestion = async (
+  suggestion: Suggestion,
+  text?: string,
+) => {
+  for await (const id of adminIds) {
+    await makeMessageToTg({
+      chatId: id,
+      text: `${text}\nId предложки: ${suggestion.id}`,
+    });
+  }
 };
 
 export const helpHtmlSuggestionScene =

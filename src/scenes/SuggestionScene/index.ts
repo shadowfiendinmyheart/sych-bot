@@ -17,6 +17,7 @@ import {
   getSuggestionKeyboard,
   helpHtmlSuggestionScene,
   KeyboardAction,
+  notifyAdminsAboutSuggestion,
 } from "./utils";
 import { SceneAlias } from "../../types/scenes";
 import { ERRORS } from "../../const";
@@ -154,6 +155,8 @@ suggestionScene.action(KeyboardAction.Send, async (ctx) => {
       "Предложка отправлена",
       getSuggestionKeyboard(updatedSuggestion),
     );
+    
+    await notifyAdminsAboutSuggestion(updatedSuggestion, "Новая предложка!");
   } catch (error) {
     await errorHandlerWithLogger({
       ctx,
@@ -185,6 +188,8 @@ suggestionScene.action(KeyboardAction.ToDraft, async (ctx) => {
       "Предложка возвращена",
       getSuggestionKeyboard(updatedSuggestion),
     );
+
+    await notifyAdminsAboutSuggestion(updatedSuggestion, "Предложку отменили...");
   } catch (error) {
     await errorHandlerWithLogger({
       ctx,
