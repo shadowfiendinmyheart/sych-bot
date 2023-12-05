@@ -53,13 +53,16 @@ export const makeRepost = async (ctx: any) => {
     }
 
     const isValidToPost = checkIsValid(vkPost);
-    console.log("isValidToPost", isValidToPost);
     if (!isValidToPost) {
       console.log(`Post ${vkPost.id} is not valid`);
       return;
     }
 
     const photosUrl = getPhotosFromVkPost(vkPost);
+    if (photosUrl.length === 0) {
+      console.log(`Post: ${vkPost.id} hasn't photos`);
+      return;
+    }
 
     const messageWithSourceLink = getMessageWithSourceLink(
       `#fromVk \n\n${vkPost.text}`,
@@ -164,7 +167,6 @@ export const getFilePosts = (postsType: "sorted" | "default"): Array<PostData> =
 };
 
 const postCounterFilePath = `${POSTS_PATH}/postCounter.txt`;
-
 export const getPostCounter = () => {
   createFileIfNotExist(postCounterFilePath);
   const counter = fs.readFileSync(postCounterFilePath, ENCODING_FORMAT);

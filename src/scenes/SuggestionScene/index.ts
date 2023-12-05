@@ -155,7 +155,7 @@ suggestionScene.action(KeyboardAction.Send, async (ctx) => {
       "Предложка отправлена",
       getSuggestionKeyboard(updatedSuggestion),
     );
-    
+
     await notifyAdminsAboutSuggestion(updatedSuggestion, "Новая предложка!");
   } catch (error) {
     await errorHandlerWithLogger({
