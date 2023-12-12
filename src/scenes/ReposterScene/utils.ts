@@ -47,7 +47,9 @@ export const makeRepost = async (ctx: any) => {
     if (isPosted) {
       console.log(
         Date.now(),
-        `\nid: ${vkPost.id}\ntime: ${Number(vkPost.date) * 1000}\nalready posted\n`,
+        `\n---reposter---\nvk post id: ${vkPost.id}\ntime: ${
+          Number(vkPost.date) * 1000
+        }\nalready posted\n`,
       );
       return;
     }

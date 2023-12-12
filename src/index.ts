@@ -43,8 +43,8 @@ bot.start(async (ctx) => {
   ctx.scene.enter(SceneAlias.Menu);
 });
 
-bot.on("message", async (ctx) => {
-  ctx.scene.enter(SceneAlias.Menu);
+bot.on("text", async (ctx) => {
+  ctx.scene.enter(ctx.scene.current?.id || SceneAlias.Menu);
 });
 
 bot.launch();
