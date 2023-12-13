@@ -31,6 +31,12 @@ export const getResolveSuggestionKeyboard = () => {
 export const getNextSuggestionKeyboard = () => {
   return Markup.inlineKeyboard([
     [Markup.button.callback("▶️", MenuKeyboardAction.GetSuggestions)],
+    [
+      Markup.button.callback(
+        "Показать админ-меню",
+        MenuKeyboardAction.ShowAdminMenu,
+      ),
+    ],
     [Markup.button.callback("В главное меню", MenuKeyboardAction.Back)],
   ]);
 };

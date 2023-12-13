@@ -15,6 +15,7 @@ import { ERRORS } from "../../const";
 export enum MenuKeyboardAction {
   GetSuggestions = "GetSuggestions",
   GetPreparedForRefuseSuggestions = "GetPreparedForRefuseSuggestions",
+  ShowAdminMenu = "ShowAdminMenu",
   Back = "Back",
 }
 
@@ -131,6 +132,10 @@ adminScene.action(SuggestionKeyboardAction.Refuse, async (ctx) => {
   } catch (error) {
     await errorHandlerWithLogger({ ctx, error, about: "admin scene refuse" });
   }
+});
+
+adminScene.action(MenuKeyboardAction.ShowAdminMenu, async (ctx) => {
+  await ctx.scene.reenter();
 });
 
 export default adminScene;
