@@ -141,7 +141,7 @@ adminScene.action(MenuKeyboardAction.GetLast30DaysStats, async (ctx) => {
     formattedStats += `${dayWithUsers[0]}: ${uniqueUsersIdsLength}\n`;
     totalUniqueUsersIds += uniqueUsersIdsLength;
   });
-  await ctx.reply(formattedStats);
+  await ctx.reply(formattedStats || 'Пустота поселилась в этом месте...');
   await ctx.reply(
     `Среднее ежедневное количество уникальных пользователей за последние 30 дней — ${(
       totalUniqueUsersIds / 30
