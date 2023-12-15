@@ -14,7 +14,6 @@ export enum KeyboardAction {
   Suggestion = "Suggestion",
   GetRandomVkPost = "GetRandomVkPost",
   Help = "Help",
-  Leaderboard = "Leaderboard",
   Admin = "AdminAction",
   Reposter = "Reposer",
 }
@@ -77,10 +76,6 @@ menuScene.action(KeyboardAction.GetRandomVkPost, async (ctx) => {
 menuScene.action(KeyboardAction.Help, async (ctx) => {
   await ctx.replyWithHTML(helpHtmlMenuScene);
   await ctx.reply("Выберите нужный пункт меню", getMenuKeyboard(ctx));
-});
-
-menuScene.action(KeyboardAction.Leaderboard, async (ctx) => {
-  // enter to leaderboard scene
 });
 
 // enter to admin scene

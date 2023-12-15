@@ -47,7 +47,7 @@ reposterScene.action(KeyboardAction.On, async (ctx) => {
   }
 
   interval = setInterval(async () => {
-    await makeRepost(ctx);
+    await makeRepost();
   }, CHECK_PERIOD);
   await ctx.reply("Репостер включился!");
 });

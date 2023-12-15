@@ -31,7 +31,7 @@ export const tgRequest = async (method: string, body: object) => {
       return;
     }
     return tgResponse.data;
-  } catch (e: any) {
+  } catch (e) {
     console.log("tg request error:", e);
   }
 };

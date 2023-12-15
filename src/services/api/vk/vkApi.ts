@@ -26,7 +26,7 @@ export const vkRequest = async <Response>(
     }
 
     return vkResponse.data.response;
-  } catch (e: any) {
+  } catch (e) {
     console.log("vk request error:", e);
   }
 };

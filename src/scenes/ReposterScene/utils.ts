@@ -38,7 +38,7 @@ export const getReposterKeyboard = () => {
 
 export const CHECK_PERIOD = 1_800_000; // 30 minutes
 
-export const makeRepost = async (ctx: any) => {
+export const makeRepost = async () => {
   try {
     const vkPost = await getVkLastPost();
     if (!vkPost) throw Error(ERRORS.GET_VK_POST);

@@ -15,6 +15,12 @@ export const getAdminKeyboard = () => {
         MenuKeyboardAction.GetPreparedForRefuseSuggestions,
       ),
     ],
+    [
+      Markup.button.callback(
+        "Смотреть статистику за последние 30 дней",
+        MenuKeyboardAction.GetLast30DaysStats,
+      ),
+    ],
     [Markup.button.callback("Назад", MenuKeyboardAction.Back)],
   ]);
 };
