@@ -3,6 +3,7 @@ import { makePostToTg } from "../../services/api/tg/tgApi";
 import { updateSuggestion } from "../../services/suggestion";
 
 import { SceneAlias } from "../../types/scenes";
+import { getMessageWithSafeLength } from "../../utils/message";
 import { errorHandlerWithLogger } from "../utils";
 import {
   getNextRefusedSuggestionKeyboard,
@@ -35,7 +36,10 @@ refuseScene.enter(async (ctx) => {
     const suggestion = await getPreparedForRefuseSuggestion();
     await ctx.reply("Отклоняемый пост:", { parse_mode: "HTML" });
     await makePostToTg({
-      post: { photos: suggestion.fileIds, text: suggestion.caption },
+      post: {
+        photos: suggestion.fileIds,
+        text: getMessageWithSafeLength(suggestion.caption),
+      },
       chatId: String(chatId),
     });
     await ctx.reply("Что будем делать?", getRefuseMenuKeyboard());
@@ -66,7 +70,10 @@ refuseScene.action(RefuseKeyboard.GetNextSuggestion, async (ctx) => {
     const suggestion = await getPreparedForRefuseSuggestion();
     await ctx.reply("Отклоняемый пост:");
     await makePostToTg({
-      post: { photos: suggestion.fileIds, text: suggestion.caption },
+      post: {
+        photos: suggestion.fileIds,
+        text: getMessageWithSafeLength(suggestion.caption),
+      },
       chatId: String(chatId),
     });
     await ctx.reply("Что будем делать?", getRefuseMenuKeyboard());

@@ -1,7 +1,7 @@
 import * as path from "path";
 
 export const API_URL = "";
-export const MAX_TG_MESSAGE_LENGTH = 900;
+export const MAX_TG_MESSAGE_LENGTH = 875;
 
 export const SUGGESTION_PATH = path.join(__dirname, "../public/suggestions");
 export const STATS_PATH = path.join(__dirname, "../public/stats");

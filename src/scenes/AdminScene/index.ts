@@ -12,6 +12,7 @@ import { getPreparedForRefuseSuggestion } from "../RefuseScene/utils";
 import { errorHandlerWithLogger } from "../utils";
 import { ERRORS } from "../../const";
 import { getLast30DaysStats } from "../../services/stats";
+import { getMessageWithSafeLength } from "../../utils/message";
 
 export enum MenuKeyboardAction {
   GetSuggestions = "GetSuggestions",
@@ -49,7 +50,10 @@ adminScene.action(MenuKeyboardAction.GetSuggestions, async (ctx) => {
 
     const currentSuggestion = sentSuggestions[0];
     await makePostToTg({
-      post: { photos: currentSuggestion.fileIds, text: currentSuggestion.caption },
+      post: {
+        photos: currentSuggestion.fileIds,
+        text: getMessageWithSafeLength(currentSuggestion.caption),
+      },
       chatId: String(chatId),
     });
 
@@ -93,14 +97,22 @@ adminScene.action(SuggestionKeyboardAction.Approve, async (ctx) => {
 
     // post into public channel
     await makePostToTg({
-      post: { photos: approvedSuggestion.fileIds, text: approvedSuggestion.caption },
+      post: {
+        photos: approvedSuggestion.fileIds,
+        text: getMessageWithSafeLength(
+          `#предложка\n\n${approvedSuggestion.caption}`,
+        ),
+      },
     });
 
     // send message to author with notification about post
     const userChatId = String(approvedSuggestion.userId);
     await makeMessageToTg({ chatId: userChatId, text: "Ваш пост опубликован!🎉" });
     await makePostToTg({
-      post: { photos: approvedSuggestion.fileIds, text: approvedSuggestion.caption },
+      post: {
+        photos: approvedSuggestion.fileIds,
+        text: getMessageWithSafeLength(approvedSuggestion.caption),
+      },
       chatId: userChatId,
     });
 
@@ -141,7 +153,7 @@ adminScene.action(MenuKeyboardAction.GetLast30DaysStats, async (ctx) => {
     formattedStats += `${dayWithUsers[0]}: ${uniqueUsersIdsLength}\n`;
     totalUniqueUsersIds += uniqueUsersIdsLength;
   });
-  await ctx.reply(formattedStats || 'Пустота поселилась в этом месте...');
+  await ctx.reply(formattedStats || "Пустота поселилась в этом месте...");
   await ctx.reply(
     `Среднее ежедневное количество уникальных пользователей за последние 30 дней — ${(
       totalUniqueUsersIds / 30

@@ -45,11 +45,14 @@ export const editChatMessage = async (
   }
 };
 
+export const getMessageWithSafeLength = (message: string) => {
+  return message.length > MAX_TG_MESSAGE_LENGTH
+    ? message.slice(0, MAX_TG_MESSAGE_LENGTH) + "..."
+    : message;
+};
+
 export const getMessageWithSourceLink = (message: string, link: string) => {
-  const postText =
-    message.length > MAX_TG_MESSAGE_LENGTH
-      ? message.slice(0, MAX_TG_MESSAGE_LENGTH) + "..."
-      : message;
+  const postText = getMessageWithSafeLength(message);
   const messageWithLink = `${postText}\n\n<a href="${link}">Источник с комментариями</a>`;
   return messageWithLink;
 };
