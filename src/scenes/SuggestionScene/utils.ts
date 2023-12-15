@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import axios from "axios";
-import { Context, Markup } from "telegraf";
+import { Markup } from "telegraf";
 import { Suggestion } from "../../types/suggestion";
 import { adminIds } from "../../utils/user";
 import { makeMessageToTg } from "../../services/api/tg/tgApi";

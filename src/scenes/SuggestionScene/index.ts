@@ -244,10 +244,4 @@ suggestionScene.action(KeyboardAction.Back, async (ctx) => {
   await ctx.scene.enter(SceneAlias.Menu);
 });
 
-suggestionScene.on("text", async (ctx) => {
-  await ctx.reply(
-    'Неизвестная команда, чтобы выйти в меню предложки воспользуйтесь командой "Назад"',
-  );
-});
-
 export default suggestionScene;

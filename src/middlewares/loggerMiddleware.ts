@@ -2,7 +2,7 @@ import { Context } from "telegraf";
 
 import { CallbackFunction } from "../types/functions";
 
-export const debugLogger = async (ctx: Context, next: CallbackFunction) => {
+export const loggerMiddleware = async (ctx: Context, next: CallbackFunction) => {
   if (ctx.message) {
     const message = ctx.message;
     console.log(

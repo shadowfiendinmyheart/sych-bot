@@ -38,7 +38,7 @@ export const getReposterKeyboard = () => {
 
 export const CHECK_PERIOD = 1_800_000; // 30 minutes
 
-export const makeRepost = async (ctx: any) => {
+export const makeRepost = async () => {
   try {
     const vkPost = await getVkLastPost();
     if (!vkPost) throw Error(ERRORS.GET_VK_POST);
@@ -47,7 +47,9 @@ export const makeRepost = async (ctx: any) => {
     if (isPosted) {
       console.log(
         Date.now(),
-        `\nid: ${vkPost.id}\ntime: ${Number(vkPost.date) * 1000}\nalready posted\n`,
+        `\n---reposter---\nvk post id: ${vkPost.id}\ntime: ${
+          Number(vkPost.date) * 1000
+        }\nalready posted\n`,
       );
       return;
     }
