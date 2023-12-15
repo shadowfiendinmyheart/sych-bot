@@ -4,6 +4,7 @@ import { ERRORS } from "../../const";
 import { makeMessageToTg, makePostToTg } from "../../services/api/tg/tgApi";
 import { getSuggestionsByStatus, updateSuggestion } from "../../services/suggestion";
 import { Suggestion } from "../../types/suggestion";
+import { getMessageWithSafeLength } from "../../utils/message";
 
 export const getRefuseMenuKeyboard = () => {
   return Markup.inlineKeyboard([
@@ -44,7 +45,10 @@ export const refuseSuggestion = async (suggestion: Suggestion, cause: string) =>
   const chatId = String(suggestion.userId);
   await makeMessageToTg({ chatId: chatId, text: "Ваш пост:" });
   await makePostToTg({
-    post: { photos: suggestion.fileIds, text: suggestion.caption },
+    post: {
+      photos: suggestion.fileIds,
+      text: getMessageWithSafeLength(suggestion.caption),
+    },
     chatId,
   });
   await makeMessageToTg({ chatId: chatId, text: `Отклонён по причине:\n${cause}` });

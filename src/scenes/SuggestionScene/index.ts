@@ -21,6 +21,7 @@ import {
 } from "./utils";
 import { SceneAlias } from "../../types/scenes";
 import { ERRORS } from "../../const";
+import { getMessageWithSafeLength } from "../../utils/message";
 
 const suggestionScene = new Scenes.BaseScene<Scenes.SceneContext>(
   SceneAlias.Suggestion,
@@ -74,7 +75,10 @@ suggestionScene.action(KeyboardAction.Show, async (ctx) => {
     );
     if (activeSuggestion.fileIds.length > 0) {
       await makePostToTg({
-        post: { photos: activeSuggestion.fileIds, text: activeSuggestion.caption },
+        post: {
+          photos: activeSuggestion.fileIds,
+          text: getMessageWithSafeLength(activeSuggestion.caption),
+        },
         chatId: String(chatId),
       });
     } else {
